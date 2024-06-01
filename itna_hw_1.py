@@ -29,7 +29,7 @@ given_polynom = np.poly1d(polynom_coefficients)
 
 def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
      """
-    Brief description of the function.
+    find one of the roots of a polynom for in bisection method if exisist.
 
     Longer description of the function that can span multiple lines.
     Explain what the function does and provide any additional details that might
@@ -42,23 +42,12 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
         x_segment : Additional keyword arguments.
         epsilon (float): Additional keyword arguments.
 
-    Keyword Args:
-        kwarg1 (bool): Description of keyword argument 1 (if using kwargs).
-        kwarg2 (float): Description of keyword argument 2 (if using kwargs).
-
     Returns:
-        bool: Description of the return value.
+        float: a root of the polynom.
 
     Raises:
         ValueError: Description of why the exception might be raised.
         TypeError: Description of why the exception might be raised.
-
-    Examples:
-        Example usage of the function.
-
-        >>> result = function_name(10, 'example', kwarg1=True)
-        >>> print(result)
-        True
 
     Notes:
         Any additional notes or comments about the function.

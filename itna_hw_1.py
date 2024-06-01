@@ -18,13 +18,21 @@ import math
 import matplotlib as plt
 
 # constant parameters
-precision_requierd = 10**(-4)
-x_line = np.linspace(-5,3,10**4)
+precision_requierd = 10**(-4) # ε
+a = -5 #begining of segment
+b = 3 #end of segment
+x_line = np.linspace(a,b,abs(b-a)*10**4)
 polynom_coefficients = [1,2,-7,0,3]
 given_polynom = np.poly1d(polynom_coefficients)
 
+print(abs(b-a)*10**4)
+epsilon = '\u03B5'
+print("Epsilon using Unicode escape sequence:", epsilon)
 
-def bisection_search(x_start,x_end,polynom):
+def bisection_search(x_start,x_end,polynom, x_segment):
+    pass
+
+
 
 
 

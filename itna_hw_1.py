@@ -16,8 +16,10 @@ import numpy as np
 import math
 import matplotlib as plt
 
+#
 precision_requierd = 10**(-4)
 x_line = np.linspace(-5,3,10**4)
+
 
 
 

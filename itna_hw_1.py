@@ -25,13 +25,24 @@ x_line = np.linspace(a,b,abs(b-a)*10**4)
 polynom_coefficients = [1,2,-7,0,3]
 given_polynom = np.poly1d(polynom_coefficients)
 
-print(abs(b-a)*10**4)
-epsilon = '\u03B5'
+
 print("Epsilon using Unicode escape sequence:", epsilon)
 
 def bisection_search(x_start,x_end,polynom, x_segment):
-    pass
+    a = x_start
+    b = x_end
+    for i in x_segment:
+        for j in np.flip(x_segment):
+            multiplication_value = polynom(i)*polynom(j)
+            if multiplication_value <= 0:
 
+                print(multiplication_value)
+                break
+
+
+
+if __name__ == "__main__":
+    bisection_search(a,b,given_polynom,x_line)
 
 
 

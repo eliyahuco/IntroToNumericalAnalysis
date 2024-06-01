@@ -8,7 +8,8 @@ This script is the HW_1 in the course intro to numerical analysis
 The objective of the script is find roots of a given polynom with several methods
 ---------------------------------------------------------------------------------
 
-Given polynom:  f(x) = X
+Given polynom:  f(x) = X⁴ + 2x³ -7x² + 3
+segment in X axis [-5,3]
 
 """
 #Labraries in use
@@ -24,7 +25,8 @@ given_polynom = np.poly1d(polynom_coefficients)
 
 
 def bisection_search(x_start,x_end,polynom):
-    
+
+
 
 
 

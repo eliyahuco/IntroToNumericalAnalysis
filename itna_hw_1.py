@@ -11,3 +11,9 @@ The objective of the script is find roots of a given polynom with several method
 Given polynom:  f(x) = xma
 
 """
+
+
+import numpy as np
+import math
+import matplotlib as plt
+print('hi')

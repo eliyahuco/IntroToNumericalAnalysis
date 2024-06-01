@@ -28,17 +28,27 @@ given_polynom = np.poly1d(polynom_coefficients)
 
 
 
-def bisection_search(x_start,x_end,polynom, x_segment):
+def bisection_search_first_guess(x_start,x_end,polynom, x_segment):
     a = x_start
     b = x_end
-    for i in x_segment:
+    if polynom(a)*polynom(b) >= 0:
+        for i in x_segment:
+            multiplicaion_value = polynom(i)*polynom(b)
+            if multiplicaion_value < 0:
+                a = i
+                break
+        if  polynom(a)*polynom(b) > 0:
+            print("Bisection method is not applicabale here")
+
+    c = 0.5*(a+b)
+    print(c)
 
 
 
 
 
 if __name__ == "__main__":
-    bisection_search(a,b,given_polynom,x_line)
+    bisection_search_first_guess(a,b,given_polynom,x_line)
 
 
 

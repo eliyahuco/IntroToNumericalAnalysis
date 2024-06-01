@@ -27,8 +27,7 @@ given_polynom = np.poly1d(polynom_coefficients)
 
 
 
-
-def bisection_search_first_guess(x_start,x_end,polynom, x_segment):
+def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     a = x_start
     b = x_end
     u = polynom(a)
@@ -39,12 +38,22 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment):
             if multiplicaion_value < 0:
                 a = i
                 break
+        u = polynom(a)
         if  u*v > 0:
             print("Bisection method is not applicabale here")
-
+    print(polynom(a))
     c = 0.5*(a+b)
     w = polynom(c)
-    print(w)
+    while abs(a-b) >= epsilon:
+        if w != 0:
+            if u*w < 0:
+                b = c
+            else:
+                a = c
+            c = 0.5*(a+b)
+    print(abs(b-a))
+    print(polynom(c))
+
 
 
 
@@ -52,7 +61,7 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment):
 
 
 if __name__ == "__main__":
-    bisection_search_first_guess(a,b,given_polynom,x_line)
+    bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd )
 
 
 

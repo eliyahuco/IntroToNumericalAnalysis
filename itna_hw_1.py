@@ -19,6 +19,8 @@ import matplotlib as plt
 # constant parameters
 precision_requierd = 10**(-4)
 x_line = np.linspace(-5,3,10**4)
+polynom_coefficients = [1,2,-7,0,3]
+given_polynom = np.poly1d(polynom_coefficients)
 
 
 def bisection_search(x_start,x_end,polynom):

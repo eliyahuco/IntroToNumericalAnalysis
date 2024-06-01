@@ -44,15 +44,22 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     print(polynom(a))
     c = 0.5*(a+b)
     w = polynom(c)
-    while abs(a-b) >= epsilon:
+    while abs(b-a) > epsilon:
         if w != 0:
             if u*w < 0:
                 b = c
             else:
                 a = c
             c = 0.5*(a+b)
-    print(abs(b-a))
-    print(polynom(c))
+    print(abs(b-a) < 10**(-4) )
+    print(abs(polynom(c)) < 10**(-4))
+    print(a)
+    print(b)
+    print(c)
+    print(abs(c-a) < 10**(-4) )
+    print(abs(c - b) < 10 ** (-4))
+    print(polynom(-3.79123))
+
 
 
 

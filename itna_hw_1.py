@@ -28,30 +28,24 @@ given_polynom = np.poly1d(polynom_coefficients)
 
 
 def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
-     """
-    find one of the roots of a polynom for in bisection method if exisist.
-
-    Longer description of the function that can span multiple lines.
-    Explain what the function does and provide any additional details that might
-    be necessary to understand its behavior.
+    """
+    Finds a root of the polynomial within a specified segment using the bisection method.
 
     Args:
-        x_start (float): begining of the segment.
-        x_end (float): end of the segment.
-        polynom : Additional positional arguments.
-        x_segment : Additional keyword arguments.
-        epsilon (float): Additional keyword arguments.
+        x_start (float): The starting value of the interval.
+        x_end (float): The ending value of the interval.
+        polynom (callable): The polynomial function to find the root of.
+        x_segment (float): The segment of the x-axis to consider.
+        epsilon (float): The acceptable error margin for the root.
 
     Returns:
-        float: a root of the polynom.
+        float: The approximated root of the polynomial within the given interval.
 
     Raises:
-        ValueError: Description of why the exception might be raised.
-        TypeError: Description of why the exception might be raised.
+        ValueError: If the interval does not contain a root or if inputs are invalid.
 
-    Notes:
-        Any additional notes or comments about the function.
-    """
+
+     """
     a = x_start
     b = x_end
     u = polynom(a)
@@ -93,9 +87,6 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
 
 if __name__ == "__main__":
     bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd )
-
-
-
 
 
 

@@ -25,26 +25,6 @@ x_line = np.linspace(a,b,abs(b-a)*10**4)
 polynom_coefficients = [1,2,-7,0,3]
 given_polynom = np.poly1d(polynom_coefficients)
 
-# derivative of the given polynom without using numpy
-def derivative_polynom(polynom):
-    """
-    Calculate the derivative of a given polynomial function.
-
-    Args:
-        polynom (callable): The polynomial function to calculate the derivative of.
-
-    Returns:
-        callable: The derivative of the given polynomial function.
-
-    Raises:
-        ValueError: If the inputs are invalid.
-    """
-    degree = len(polynom.coefficients) - 1
-    derivative_coefficients = []
-    for i in range(1,degree+1):
-        derivative_coefficients.append(polynom.coefficients[i]*i)
-    return np.poly1d(derivative_coefficients)
-
 
 # bisection method for finding the first root of a polynom
 def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
@@ -108,38 +88,13 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     print(abs(c)  < 10 ** (-4))
     return c
 
-# newton - raphson method for finding the rest roots of a given polynom after given the first root
-def newton_raphson_method(polynom,first_root,epsilon):
-    """
-    Finds the rest roots of the polynomial using the Newton-Raphson method.
-
-    Args:
-        polynom (callable): The polynomial function to find the root of.
-        first_root (float): The first root of the polynomial.
-        epsilon (float): The acceptable error margin for the root.
-
-    Returns:
-        list: The approximated roots of the polynomial.
-
-    Raises:
-        ValueError: If the inputs are invalid.
-    """
-    roots = []
-    polynom = np.polyder(polynom)
-    x = first_root
-    while polynom(x) > epsilon:
-        x = x - polynom(x) /np.polyder(polynom,x)
-        roots.append(x)
-    return roots
-
 
 
 
 
 
 if __name__ == "__main__":
-    newton_raphson_method(given_polynom, bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd ), precision_requierd)
-    print("The roots of the given polynom are: ", newton_raphson_method(polynom, bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd ), precision_requierd))
+    print(bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd))
 
 
 

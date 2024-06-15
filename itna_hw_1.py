@@ -25,8 +25,28 @@ x_line = np.linspace(a,b,abs(b-a)*10**4)
 polynom_coefficients = [1,2,-7,0,3]
 given_polynom = np.poly1d(polynom_coefficients)
 
+# derivative of the given polynom without using numpy
+def derivative_polynom(polynom):
+    """
+    Calculate the derivative of a given polynomial function.
+
+    Args:
+        polynom (callable): The polynomial function to calculate the derivative of.
+
+    Returns:
+        callable: The derivative of the given polynomial function.
+
+    Raises:
+        ValueError: If the inputs are invalid.
+    """
+    degree = len(polynom.coefficients) - 1
+    derivative_coefficients = []
+    for i in range(1,degree+1):
+        derivative_coefficients.append(polynom.coefficients[i]*i)
+    return np.poly1d(derivative_coefficients)
 
 
+# bisection method for finding the first root of a polynom
 def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     """
     Finds a root of the polynomial within a specified segment using the bisection method.
@@ -50,6 +70,10 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     b = x_end
     u = polynom(a)
     v = polynom(b)
+    if u == 0:
+        return a
+    elif v == 0:
+        return b
     if u*v >= 0:
         for i in x_segment:
             multiplicaion_value = polynom(i)*v
@@ -57,28 +81,56 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
                 a = i
                 break
         u = polynom(a)
-        if  u*v > 0:
-            print("Bisection method is not applicabale here")
-    print(polynom(a))
-    c = 0.5*(a+b)
-    w = polynom(c)
+    if  u*v > 0:
+        print("Bisection method is not applicabale here")
+        return None
     while abs(b-a) > epsilon:
-        if w != 0:
-            if u*w < 0:
-                b = c
-            else:
-                a = c
-            c = 0.5*(a+b)
+        c = 0.5 * (a + b)
+        w = polynom(c)
+        if w == 0:
+            return c
+        if u*w < 0:
+            b = c
+            v = w
+        else:
+            a = c
+            u = w
+
+
     print(abs(b-a) < 10**(-4) )
-    print(abs(polynom(c)) < 10**(-4))
+    print(abs(polynom(c)))
     print(a)
     print(b)
     print(c)
     print(abs(c-a) < 10**(-4) )
-    print(abs(c - b) < 10 ** (-4))
-    print(polynom(-3.79123))
+    print(abs(b - c) < 10 ** (-4))
+    print(polynom(c))
+    print(abs(c)  < 10 ** (-4))
+    return c
 
+# newton - raphson method for finding the rest roots of a given polynom after given the first root
+def newton_raphson_method(polynom,first_root,epsilon):
+    """
+    Finds the rest roots of the polynomial using the Newton-Raphson method.
 
+    Args:
+        polynom (callable): The polynomial function to find the root of.
+        first_root (float): The first root of the polynomial.
+        epsilon (float): The acceptable error margin for the root.
+
+    Returns:
+        list: The approximated roots of the polynomial.
+
+    Raises:
+        ValueError: If the inputs are invalid.
+    """
+    roots = []
+    polynom = np.polyder(polynom)
+    x = first_root
+    while polynom(x) > epsilon:
+        x = x - polynom(x) /np.polyder(polynom,x)
+        roots.append(x)
+    return roots
 
 
 
@@ -86,7 +138,8 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
 
 
 if __name__ == "__main__":
-    bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd )
+    newton_raphson_method(given_polynom, bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd ), precision_requierd)
+    print("The roots of the given polynom are: ", newton_raphson_method(polynom, bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd ), precision_requierd))
 
 
 

@@ -43,6 +43,32 @@ def derivative_polynom_in_x(polynom,x_0,epsilon):
     u = polynom(a)
     v = polynom(b)
     return (v-u)/epsilon
+#dvide a polynom by (x-x_0) where x_0 is a root of the polynom
+def polynom_devision(polynom, x_0):
+    """"
+Returns the result of dividing a polynomial by (x-x_0).
+
+    Args:
+        polynom (callable): The polynomial function to divide.
+        x_0 (float): The root to divide the polynomial by.
+
+    Returns:
+        tuple: The quotient and the remainder of the division.
+
+    Raises:
+        ValueError: If the root is not a root of the polynomial or if inputs are invalid.
+    """
+
+    polynom_coeff = polynom.coefficients
+    n = len(polynom_coeff)
+    quotient = np.zeros(n-1)
+    remainder = polynom_coeff[0]
+    for i in range(1,n):
+        quotient[i-1] = remainder
+        remainder = polynom_coeff[i] + remainder*x_0
+    return np.poly1d(quotient), remainder
+
+
 
 
 
@@ -75,14 +101,14 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
         return a
     elif v == 0:
         return b
-    if u*v >= 0:
-        for i in x_segment:
+    if u*v >= 0: # if the segment does not contain a root
+        for i in x_segment:#
             multiplicaion_value = polynom(i)*v
             if multiplicaion_value < 0:
                 a = i
                 break
         u = polynom(a)
-    if  u*v > 0:
+    if  u*v > 0:# if the segment does not contain a root
         print("Bisection method is not applicabale here")
         return None
     while abs(b-a) > epsilon:
@@ -96,17 +122,7 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
         else:
             a = c
             u = w
-
-
-    print(abs(b-a) < 10**(-4) )
-    print(abs(polynom(c)))
-    print(a)
-    print(b)
-    print(c)
-    print(abs(c-a) < 10**(-4) )
-    print(abs(b - c) < 10 ** (-4))
-    print(polynom(c))
-    print(abs(c)  < 10 ** (-4))
+    print(polynom(c)<10**(-4))
     return c
 
 #newton-raphson method for finding a root of a polynom
@@ -131,54 +147,12 @@ def newton_raphson_method(polynom, x_0=0, epsilon=10**(-4)):
     while abs(x_1 - x) > epsilon:
         x = x_1
         x_1 = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
+    print(polynom(x_1)<10**(-4))
+    print(x_1)
     return x_1
 
 
-def synthetic_division_step(polynom, root):
-    """
-    Performs a single step of the synthetic division method.
 
-    Args:
-        polynom (callable): The polynomial function to divide.
-        root (float): The root to divide the polynomial by.
-
-    Returns:
-        tuple: The coefficients of the quotient and the remainder.
-
-    """
-    n = len(polynom.coefficients) - 1
-    quotient = np.zeros(n)
-    remainder = polynom.coefficients[-1]
-    for i in range(n - 1, -1, -1):
-        quotient[i] = remainder
-        remainder = polynom.coefficients[i] + root * remainder
-    return quotient, remainder
-#synthetic division method for finding all roots of a polynom
-def synthetic_division(polynom, first_root, epsilon):
-    """
-    Finds all roots of the polynomial using the synthetic division method.
-
-    Args:
-        polynom (callable): The polynomial function to find the roots of.
-        first_root (float): The first root of the polynomial.
-        epsilon (float): The acceptable error margin for the roots.
-
-    Returns:
-        list: The approximated roots of the polynomial.
-
-    Raises:
-        ValueError: If the method does not converge or if inputs are invalid.
-
-    """
-    roots = [first_root]
-    quotient, remainder = synthetic_division_step(polynom, first_root)
-    while len(quotient) > 1:
-            root = newton_raphson_method(np.poly1d(quotient), 0, epsilon)
-            if (root+10*epsilon or root-epsilon) in roots:
-                break
-            roots.append(root)
-            quotient, remainder = synthetic_division_step(np.poly1d(quotient), root)
-    return roots
 
 
 
@@ -196,11 +170,8 @@ def synthetic_division(polynom, first_root, epsilon):
 
 if __name__ == "__main__":
     print(bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd))
-    print(newton_raphson_method(given_polynom,0,precision_requierd))
-    print(synthetic_division_step(given_polynom,-0.6180773365624102 ))
-    # print(synthetic_division(given_polynom,bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd),precision_requierd))
-
-
-
+    print(newton_raphson_method(given_polynom,-5,precision_requierd))
+    print(polynom_devision()nom_devision(given_polynom,bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd)))
+    print(polynom_devision()nom_devision(np.poly1d([1,5,20]),6))
 
 

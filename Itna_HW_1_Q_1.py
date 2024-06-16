@@ -224,6 +224,7 @@ def main():
         plt.scatter(i, given_polynom(i), color='red')#mark the roots on the plot
     plt.legend([f'Roots: {given_polynom.roots}'])#add legend to the plot
     plot_polynom(given_polynom, x_line)
+    plt.grid
     plt.show()
 
 

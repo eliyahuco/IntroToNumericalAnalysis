@@ -220,6 +220,16 @@ def main():
 
     print(sorted(given_polynom.roots))
 
+    #mark the roots on the plot
+
+
+    for i in roots:
+        plt.scatter(i, given_polynom(i), color='red')
+
+    # add legend with the roots
+    plt.legend([f'Roots: {given_polynom.roots}'])
+    plot_polynom(given_polynom, x_line)
+
 
 
 

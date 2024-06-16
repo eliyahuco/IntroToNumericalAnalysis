@@ -26,6 +26,27 @@ polynom_coefficients = [1,2,-7,0,3]
 given_polynom = np.poly1d(polynom_coefficients)
 
 
+# function to calculate the value of a polynom in a given x
+def derivative_polynom_in_x(polynom,x_0,epsilon):
+    """
+    Returns the derivative of a given polynomial.
+
+    Args:
+        polynom (callable): The polynomial function to differentiate.
+
+    Returns:
+        callable: The derivative of the polynomial function.
+
+    """
+    a = x_0
+    b = x_0 + epsilon
+    u = polynom(a)
+    v = polynom(b)
+    return (v-u)/epsilon
+
+
+
+
 # bisection method for finding the first root of a polynom
 def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     """
@@ -88,6 +109,34 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     print(abs(c)  < 10 ** (-4))
     return c
 
+#newton-raphson method for finding a root of a polynom
+def newton_raphson_method(polynom, x_0, epsilon):
+    """
+    Finds a root of the polynomial using the Newton-Raphson method.
+
+    Args:
+        polynom (callable): The polynomial function to find the root of.
+        x_0 (float): The initial guess for the root.
+        epsilon (float): The acceptable error margin for the root.
+
+    Returns:
+        float: The approximated root of the polynomial.
+
+    Raises:
+        ValueError: If the method does not converge or if inputs are invalid.
+
+    """
+    x = x_0
+
+    while abs(polynom(x)) > epsilon:
+        x = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
+
+    return x
+#using the nwton-raphson method and the to find all the roots of the given polynom
+
+
+
+
 
 
 
@@ -95,6 +144,8 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
 
 if __name__ == "__main__":
     print(bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd))
+    print(newton_raphson_method(given_polynom,-4,precision_requierd))
+    print(find_all_roots(given_polynom,x_line,precision_requierd))
 
 
 

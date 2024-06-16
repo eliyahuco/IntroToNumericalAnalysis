@@ -145,31 +145,8 @@ def newton_raphson_method(polynom, x_0=0, epsilon=10**(-4)):
     return x_1
 
 #finfing all the roots of a polynom using the newton-raphson method
-def newton_raphson_all_roots(polynom, x_0=0, epsilon=10**(-4)):
-    """
-    Finds all the roots of the polynomial using the Newton-Raphson method.
 
-    Args:
-        polynom (callable): The polynomial function to find the roots of.
-        x_0 (float): The initial guess for the root.
-        epsilon (float): The acceptable error margin for the root.
 
-    Returns:
-        list: The approximated roots of the polynomial.
-
-    Raises:
-        ValueError: If the method does not converge or if inputs are invalid.
-
-    """
-    for i in range(0, polynom.order):
-        roots = []
-        x = x_0
-        x_1 = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
-        while abs(x_1 - x) > epsilon:
-            x = x_1
-            x_1 = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
-        roots.append(x_1)
-        return roots
 
 #synthetic division for polynoms
 def synthetic_devision_method(polynom, x_0):
@@ -234,8 +211,17 @@ def main():
     given_polynom = np.poly1d(polynom_coefficients)
     first_root_using_bisection  = bisection_search_first_guess(a, b, given_polynom, x_line, precision_requierd)
     print(f'The first root using bisection method is: {first_root_using_bisection}')
-    all_roots = newton_raphson_all_roots(given_polynom)
-    print(f'The roots using Newton-Raphson method are: {all_roots}')
+    roots = []
+    for i in np.linspace(a, b, abs(b - a) *2):
+
+        new_root = round(newton_raphson_method(given_polynom, i),4)
+        roots.append(new_root)
+    roots = sorted(list(set(roots)))
+    print(f'The roots using Newton-Raphson method are: {roots}')
+    print(newton_raphson_method(given_polynom, -2, precision_requierd))
+    print(sorted(given_polynom.roots))
+
+
 
 
 

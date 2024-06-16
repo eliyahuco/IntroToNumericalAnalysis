@@ -110,7 +110,7 @@ def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
     return c
 
 #newton-raphson method for finding a root of a polynom
-def newton_raphson_method(polynom, x_0, epsilon):
+def newton_raphson_method(polynom, x_0=0, epsilon=10**(-4)):
     """
     Finds a root of the polynomial using the Newton-Raphson method.
 
@@ -127,12 +127,64 @@ def newton_raphson_method(polynom, x_0, epsilon):
 
     """
     x = x_0
+    x_1 = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
+    while abs(x_1 - x) > epsilon:
+        x = x_1
+        x_1 = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
+    return x_1
 
-    while abs(polynom(x)) > epsilon:
-        x = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
 
-    return x
-#using the nwton-raphson method and the to find all the roots of the given polynom
+def synthetic_division_step(polynom, root):
+    """
+    Performs a single step of the synthetic division method.
+
+    Args:
+        polynom (callable): The polynomial function to divide.
+        root (float): The root to divide the polynomial by.
+
+    Returns:
+        tuple: The coefficients of the quotient and the remainder.
+
+    """
+    n = len(polynom.coefficients) - 1
+    quotient = np.zeros(n)
+    remainder = polynom.coefficients[-1]
+    for i in range(n - 1, -1, -1):
+        quotient[i] = remainder
+        remainder = polynom.coefficients[i] + root * remainder
+    return quotient, remainder
+#synthetic division method for finding all roots of a polynom
+def synthetic_division(polynom, first_root, epsilon):
+    """
+    Finds all roots of the polynomial using the synthetic division method.
+
+    Args:
+        polynom (callable): The polynomial function to find the roots of.
+        first_root (float): The first root of the polynomial.
+        epsilon (float): The acceptable error margin for the roots.
+
+    Returns:
+        list: The approximated roots of the polynomial.
+
+    Raises:
+        ValueError: If the method does not converge or if inputs are invalid.
+
+    """
+    roots = [first_root]
+    quotient, remainder = synthetic_division_step(polynom, first_root)
+    while len(quotient) > 1:
+            root = newton_raphson_method(np.poly1d(quotient), 0, epsilon)
+            if (root+10*epsilon or root-epsilon) in roots:
+                break
+            roots.append(root)
+            quotient, remainder = synthetic_division_step(np.poly1d(quotient), root)
+    return roots
+
+
+
+
+
+
 
 
 
@@ -144,8 +196,10 @@ def newton_raphson_method(polynom, x_0, epsilon):
 
 if __name__ == "__main__":
     print(bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd))
-    print(newton_raphson_method(given_polynom,-4,precision_requierd))
-    print(find_all_roots(given_polynom,x_line,precision_requierd))
+    print(newton_raphson_method(given_polynom,0,precision_requierd))
+    print(synthetic_division_step(given_polynom,-0.6180773365624102 ))
+    # print(synthetic_division(given_polynom,bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd),precision_requierd))
+
 
 
 

@@ -15,7 +15,7 @@ segment in X axis [-5,3]
 #Labraries in use
 import numpy as np
 import math
-import matplotlib as plt
+from matplotlib import pyplot as plt
 
 # constant parameters
 precision_requierd = 10**(-4) # ε
@@ -43,6 +43,8 @@ def derivative_polynom_in_x(polynom,x_0,epsilon):
     u = polynom(a)
     v = polynom(b)
     return (v-u)/epsilon
+
+
 #dvide a polynom by (x-x_0) where x_0 is a root of the polynom
 def polynom_devision(polynom, x_0):
     """"
@@ -151,27 +153,62 @@ def newton_raphson_method(polynom, x_0=0, epsilon=10**(-4)):
     print(x_1)
     return x_1
 
+#synthetic division for polynoms
+def synthetic_devision_method(polynom, x_0):
+
+
+    x = x_0
+    devided_polynom = polynom_devision(polynom, x)
+    r_0 = devided_polynom[1]
+    r_1 = polynom_devision(devided_polynom[0], x)[1]
+    if r_1 == 0:
+            print("The method does not converge")
+            return None
+    x = x - r_0 / r_1
+
+    while abs(x-x_0) > 10**(-4):
+        x_0 = x
+        devided_polynom = polynom_devision(polynom, x)
+        r_0 = devided_polynom[1]
+        r_1 = polynom_devision(devided_polynom[0], x)[1]
+
+        if r_1 == 0:
+            print("The method does not converge")
+            break
+
+        x = x - r_0 / r_1
+
+    return x
+#plot the polynom in the segment
+def plot_polynom(polynom, x_segment):
+    """
+    Plots the polynomial function within the specified segment.
+
+    Args:
+        polynom (callable): The polynomial function to plot.
+        x_segment (tuple): The segment of the x-axis to consider.
+
+    """
+    y = polynom(x_segment)
+    plt.plot(x_segment, y)
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('f(x) = X⁴ + 2x³ -7x² + 3')
+    plt.grid()
+    plt.show()
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     print(bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd))
-    print(newton_raphson_method(given_polynom,-5,precision_requierd))
-    print(polynom_devision()nom_devision(given_polynom,bisection_search_first_guess(a,b,given_polynom,x_line,precision_requierd)))
-    print(polynom_devision()nom_devision(np.poly1d([1,5,20]),6))
+    print(newton_raphson_method(given_polynom,0,precision_requierd))
+    polynom_devision(given_polynom, 0)
+    print(given_polynom(0))
+    p1 = np.poly1d([1,-1,-10,-8])
+    plot_polynom(given_polynom, x_line)
+    roots = np.roots(given_polynom)
+    print(roots)
 
 

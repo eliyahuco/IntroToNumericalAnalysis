@@ -188,23 +188,6 @@ def synthetic_devision_method(polynom, x_0):
         x = x - r_0 / r_1
 
     return x
-#plot the polynom in the segment
-def plot_polynom(polynom, x_segment):
-    """
-    Plots the polynomial function within the specified segment.
-
-    Args:
-        polynom (callable): The polynomial function to plot.
-        x_segment (tuple): The segment of the x-axis to consider.
-
-    """
-    y = polynom(x_segment)
-    plt.plot(x_segment, y)
-    plt.xlabel('x')
-    plt.ylabel('f(x)')
-    plt.title('f(x) = X⁴ + 2x³ -7x² + 3')
-    plt.grid()
-    plt.show()
 
 #check if the roots are in the required precision and compare between the roots found by the different methods
 def print_roots_errors_for_diffrenent_method(analytical_roots , polynom ,methods, epsilon = 10**(-4)):
@@ -325,36 +308,18 @@ def main():
         print('################################################################################################################################')
         print("")
 
-
-    print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, "bisection", precision_requierd)
-    print("")
-    print('################################################################################################################################')
-    print("")
-    print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, "newton_raphson", precision_requierd)
-    print("")
-    print('################################################################################################################################')
-    print("")
-    print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, "synthetic_division", precision_requierd)
-    print("")
-    print('################################################################################################################################')
-    print("")
-
-
-
-
-
-
-    print(f'The analytical solution from wolfram alpa is: {analytical_solution_wolfram_alpha}')
-    print(sorted(given_polynom.roots))
-    print(sorted(analytical_solution_wolfram_alpha) == sorted(given_polynom.roots))#check if the roots are the same as the analytical solution
-
-
+    plt.figure(figsize=(8, 8))
     for i in analytical_solution_wolfram_alpha:
         plt.scatter(i, given_polynom(i), color='red')#mark the roots on the plot
     plt.legend([f'Roots: {given_polynom.roots}'])#add legend to the plot
-    plot_polynom(given_polynom, x_line)
-
+    y = given_polynom(x_line)
+    plt.plot(x_line, y)
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.title('f(x) = X⁴ + 2x³ -7x² + 3')
+    plt.grid()
     plt.show()
+    print("thank you for using the script")
 
 
 

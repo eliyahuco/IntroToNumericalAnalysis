@@ -206,6 +206,43 @@ def plot_polynom(polynom, x_segment):
     plt.grid()
     plt.show()
 
+    #check if the roots are in the required precision and compare between the roots found by the different methods
+    def check_roots_error_for_diffrenent_method(analytical_roors , polynom ,methods, epsilon = 10**(-4)):
+        """
+        Check if the roots are in the required precision and compare between the roots found by the different methods.
+
+        Args:
+            analytical_roots (list of float): The analytical roots of the polynomial.
+            polynom (callable): The polynomial function to find the roots of.
+            epsilon (float): The acceptable error margin for the roots.
+
+        Returns:
+            bool: True if the roots are in the required precision and the roots are the same, False otherwise.
+
+        """
+        if methods == "bisection":
+            one_root = bisection_search_first_guess(a, b, polynom, x_line, epsilon)
+            for i in analytical_roots:
+                if abs(one_root - i) <
+                    print()
+
+
+        roots_newton_raphson = []
+        for i in np.linspace(a, b, abs(b - a) * 10):
+            new_root = newton_raphson_method(polynom, i)
+            roots_newton_raphson.append(new_root)
+        roots_newton_raphson = sorted(list(set(roots_newton_raphson)))
+        if sorted(roots_newton_raphson) != sorted(analytical_roots):
+            return False
+        roots_synthetic_division = []
+        for i in np.linspace(a, b, abs(b - a) * 10):
+            new_root = synthetic_devision_method(polynom, i)
+            roots_synthetic_division.append(new_root)
+        roots_synthetic_division = sorted(list(set(roots_synthetic_division)))
+        if sorted(roots_synthetic_division) != sorted(analytical_roots):
+            return False
+        return True
+
 def main():
     """"
     The main function of the script.
@@ -240,7 +277,6 @@ def main():
     print(f'The analytical solution from wolfram alpa is: {analytical_solution_wolfram_alpha}')
     print(sorted(given_polynom.roots))
     print(sorted(analytical_solution_wolfram_alpha) == sorted(given_polynom.roots))#check if the roots are the same as the analytical solution
-
 
 
     for i in roots_newton_raphson:

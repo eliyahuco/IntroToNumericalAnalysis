@@ -223,7 +223,8 @@ def plot_polynom(polynom, x_segment):
         if methods == "bisection":
             one_root = bisection_search_first_guess(a, b, polynom, x_line, epsilon)
             for i in analytical_roots:
-                if abs(one_root - i) <
+                if abs(one_root - i) < 10**(-4):
+
                     print()
 
 

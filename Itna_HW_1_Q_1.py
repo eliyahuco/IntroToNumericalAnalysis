@@ -206,43 +206,100 @@ def plot_polynom(polynom, x_segment):
     plt.grid()
     plt.show()
 
-    #check if the roots are in the required precision and compare between the roots found by the different methods
-    def check_roots_error_for_diffrenent_method(analytical_roors , polynom ,methods, epsilon = 10**(-4)):
-        """
-        Check if the roots are in the required precision and compare between the roots found by the different methods.
-
-        Args:
-            analytical_roots (list of float): The analytical roots of the polynomial.
-            polynom (callable): The polynomial function to find the roots of.
-            epsilon (float): The acceptable error margin for the roots.
-
-        Returns:
-            bool: True if the roots are in the required precision and the roots are the same, False otherwise.
-
-        """
-        if methods == "bisection":
-            one_root = bisection_search_first_guess(a, b, polynom, x_line, epsilon)
-            for i in analytical_roots:
-                if abs(one_root - i) < 10**(-4):
-
-                    print()
+#check if the roots are in the required precision and compare between the roots found by the different methods
+def print_roots_errors_for_diffrenent_method(analytical_roots , polynom ,methods, epsilon = 10**(-4)):
+    """
+    Finds the roots of a polynomial using different methods and compares them to the analytical solution.
 
 
-        roots_newton_raphson = []
-        for i in np.linspace(a, b, abs(b - a) * 10):
-            new_root = newton_raphson_method(polynom, i)
+    """
+    analytical_roots = sorted(analytical_roots)
+
+    if methods == "bisection":
+        print("***bisection***")
+        one_root = bisection_search_first_guess(a, b, polynom, x_line, epsilon)
+        count = 0
+        absulute_error = []
+        relative_error = []
+        for root in analytical_roots:
+            if abs(one_root - root) > epsilon:
+                count += 1
+            absulute_error.append(abs(one_root - root))
+            relative_error.append(abs(one_root - root) / root)
+
+        index_analytical_one_root = absulute_error.index(min(absulute_error))
+        analytical_one_root = analytical_roots[index_analytical_one_root]
+        print(f'The root found by the bisection method is: {one_root} and the analytical root is: {analytical_one_root}')
+        if count == len(analytical_roots):
+            print("The root are not in the required precision")
+            print(f'The absolute error is: {absulute_error[index_analytical_one_root]}')
+            print(f'The relative error is: {relative_error[index_analytical_one_root]}')
+        else:
+            print("The root are in the required precision")
+            print(f'The absolute error is: {abs(absulute_error[index_analytical_one_root])}')
+            print(f'The relative error is: {abs(relative_error[index_analytical_one_root])}')
+        return one_root,analytical_one_root
+
+    if methods == "newton_raphson":
+        print("***newton_raphson***")
+        roots_newton_raphson = []  # find all the roots using newton-raphson method
+        for i in np.linspace(a, b,abs(b - a) * 10):  # seting the initial guess for the newton-raphson method using the segment in the x axis
+            new_root = round(newton_raphson_method(given_polynom, i), 5)
             roots_newton_raphson.append(new_root)
         roots_newton_raphson = sorted(list(set(roots_newton_raphson)))
-        if sorted(roots_newton_raphson) != sorted(analytical_roots):
+        print(f'The roots using Newton-Raphson method are: {roots_newton_raphson}')
+        count = 0
+        absulute_error = []
+        relative_error = []
+        if len(roots_newton_raphson) != len(analytical_roots):
+            print("not all the roots are found")
             return False
-        roots_synthetic_division = []
-        for i in np.linspace(a, b, abs(b - a) * 10):
-            new_root = synthetic_devision_method(polynom, i)
+        else:
+            for root in range(len(analytical_roots)):
+                if abs(roots_newton_raphson[root] - analytical_roots[root]) > epsilon:
+                    count += 1
+                absulute_error.append(abs(roots_newton_raphson[root] - analytical_roots[root]))
+                relative_error.append(abs((roots_newton_raphson[root] - analytical_roots[root]) / analytical_roots[root]))
+        if count == len(analytical_roots):
+            print("The root are not in the required precision")
+            print(f'The absolute error is: {absulute_error}')
+            print(f'The relative error is: {relative_error}')
+        else:
+            print("The root are in the required precision")
+            print(f'The absolute error is: {absulute_error}')
+            print(f'The relative error is: {relative_error}')
+        return roots_newton_raphson,analytical_roots
+
+    if methods == "synthetic_division":
+        print("***synthetic_division***")
+        roots_synthetic_division = []  # find all the roots using synthetic division method
+        for i in np.linspace(a, b,
+                             abs(b - a) * 10):  # seting the initial guess for the synthetic division method using the segment in the x axis
+            new_root = round(synthetic_devision_method(given_polynom, i), 5)
             roots_synthetic_division.append(new_root)
         roots_synthetic_division = sorted(list(set(roots_synthetic_division)))
-        if sorted(roots_synthetic_division) != sorted(analytical_roots):
+        print(f'The roots using synthetic division method are: {roots_synthetic_division}')
+        count = 0
+        absulute_error = []
+        relative_error = []
+        if len(roots_synthetic_division) != len(analytical_roots):
+            print("not all the roots are found")
             return False
-        return True
+        else:
+            for root in range(len(analytical_roots)):
+                if abs(roots_synthetic_division[root] - analytical_roots[root]) > epsilon:
+                    count += 1
+                absulute_error.append(abs(roots_synthetic_division[root] - analytical_roots[root]))
+                relative_error.append(abs((roots_synthetic_division[root] - analytical_roots[root]) / analytical_roots[root]))
+        if count == len(analytical_roots):
+            print("The root are not in the required precision")
+            print(f'The absolute error is: {absulute_error}')
+            print(f'The relative error is: {relative_error}')
+        else:
+            print("The root are in the required precision")
+            print(f'The absolute error is: {absulute_error}')
+            print(f'The relative error is: {relative_error}')
+        return roots_synthetic_division,analytical_roots
 
 def main():
     """"
@@ -253,26 +310,38 @@ def main():
     compare between the roots found by the different methods
     and plot the polynom and the roots on the plot
     """
+    methods = ["bisection", "newton_raphson", "synthetic_division"]
+    print(f'The given polynom is: {given_polynom}')
+    print(f'The segment in the x axis is: [{a}:{b}]')
+    print(f'The analytical roots are: {analytical_solution_wolfram_alpha}')
+    print(f'The required precision is: {precision_requierd}')
+    print(f'the methods used are: {methods}')
+    print("")
+    print('################################################################################################################################')
+    print("")
+    for method in methods:
+        print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, method, precision_requierd)
+        print("")
+        print('################################################################################################################################')
+        print("")
 
 
-    first_root_using_bisection  = round(bisection_search_first_guess(a, b, given_polynom, x_line, precision_requierd),5)#find the first root using bisection method
-    print(f'The first root using bisection method is: {first_root_using_bisection}')
-    roots_newton_raphson = []#find all the roots using newton-raphson method
-    for i in np.linspace(a, b, abs(b - a) *10): #seting the initial guess for the newton-raphson method using the segment in the x axis
+    print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, "bisection", precision_requierd)
+    print("")
+    print('################################################################################################################################')
+    print("")
+    print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, "newton_raphson", precision_requierd)
+    print("")
+    print('################################################################################################################################')
+    print("")
+    print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, "synthetic_division", precision_requierd)
+    print("")
+    print('################################################################################################################################')
+    print("")
 
-        new_root = round(newton_raphson_method(given_polynom, i),5)
-        roots_newton_raphson.append(new_root)
-    roots_newton_raphson = sorted(list(set(roots_newton_raphson)))
-    print(f'The roots using Newton-Raphson method are: {roots_newton_raphson}')
 
-    roots_synthetic_division = []#find all the roots using synthetic division method
-    for i in np.linspace(a, b, abs(b - a) * 10):#seting the initial guess for the synthetic division method using the segment in the x axis
-        new_root = round(synthetic_devision_method(given_polynom, i), 5)
-        roots_synthetic_division.append(new_root)
-    roots_synthetic_division = sorted(list(set(roots_synthetic_division)))
-    print(f'The roots using synthetic division method are: {roots_synthetic_division}')
 
-    print(sorted(given_polynom.roots.round(5)))
+
 
 
     print(f'The analytical solution from wolfram alpa is: {analytical_solution_wolfram_alpha}')
@@ -280,7 +349,7 @@ def main():
     print(sorted(analytical_solution_wolfram_alpha) == sorted(given_polynom.roots))#check if the roots are the same as the analytical solution
 
 
-    for i in roots_newton_raphson:
+    for i in analytical_solution_wolfram_alpha:
         plt.scatter(i, given_polynom(i), color='red')#mark the roots on the plot
     plt.legend([f'Roots: {given_polynom.roots}'])#add legend to the plot
     plot_polynom(given_polynom, x_line)

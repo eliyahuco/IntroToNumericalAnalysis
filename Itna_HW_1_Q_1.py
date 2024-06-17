@@ -24,6 +24,7 @@ b = 3  # end of segment
 x_line = np.linspace(a, b, abs(b - a) * 10 ** 4)
 polynom_coefficients = [1, 2, -7, 0, 3]
 given_polynom = np.poly1d(polynom_coefficients)
+analytical_solution_wolfram_alpha = [0.5*(1-math.sqrt(5)), 0.5*(1+math.sqrt(5)), 0.5*(-3-math.sqrt(21)), 0.5*(math.sqrt(21)-3)]#analytical solution from wolfram alpha
 
 
 # function to calculate the value of a polynom in a given x
@@ -233,10 +234,12 @@ def main():
     roots_synthetic_division = sorted(list(set(roots_synthetic_division)))
     print(f'The roots using synthetic division method are: {roots_synthetic_division}')
 
+    print(sorted(given_polynom.roots.round(5)))
 
 
-
+    print(f'The analytical solution from wolfram alpa is: {analytical_solution_wolfram_alpha}')
     print(sorted(given_polynom.roots))
+    print(sorted(analytical_solution_wolfram_alpha) == sorted(given_polynom.roots))#check if the roots are the same as the analytical solution
 
 
 

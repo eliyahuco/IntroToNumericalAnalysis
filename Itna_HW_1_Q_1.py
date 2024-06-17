@@ -211,20 +211,27 @@ def main():
     making use of the functions above to find the roots of the given polynom
     find the first root using bisection method and the rest using newton-raphson method and synthetic division method
     comper to the analytical solution and check if the error is less than the required precision
+    compare btween the methods
     and plot the polynom and the roots on the plot
     """
 
 
-    first_root_using_bisection  = bisection_search_first_guess(a, b, given_polynom, x_line, precision_requierd)#find the first root using bisection method
+    first_root_using_bisection  = round(bisection_search_first_guess(a, b, given_polynom, x_line, precision_requierd),5)#find the first root using bisection method
     print(f'The first root using bisection method is: {first_root_using_bisection}')
     roots_newton_raphson = []#find all the roots using newton-raphson method
-    for i in np.linspace(a, b, abs(b - a) *2):
+    for i in np.linspace(a, b, abs(b - a) *10): #seting the initial guess for the newton-raphson method using the segment in the x axis
 
-        new_root = round(newton_raphson_method(given_polynom, i),4)
+        new_root = round(newton_raphson_method(given_polynom, i),5)
         roots_newton_raphson.append(new_root)
-    roots = sorted(list(set(roots_newton_raphson)))
+    roots_newton_raphson = sorted(list(set(roots_newton_raphson)))
     print(f'The roots using Newton-Raphson method are: {roots_newton_raphson}')
-    #find all the roots using synthetic division method
+
+    roots_synthetic_division = []#find all the roots using synthetic division method
+    for i in np.linspace(a, b, abs(b - a) * 10):#seting the initial guess for the synthetic division method using the segment in the x axis
+        new_root = round(synthetic_devision_method(given_polynom, i), 5)
+        roots_synthetic_division.append(new_root)
+    roots_synthetic_division = sorted(list(set(roots_synthetic_division)))
+    print(f'The roots using synthetic division method are: {roots_synthetic_division}')
 
 
 
@@ -233,7 +240,7 @@ def main():
 
 
 
-    for i in roots:
+    for i in roots_newton_raphson:
         plt.scatter(i, given_polynom(i), color='red')#mark the roots on the plot
     plt.legend([f'Roots: {given_polynom.roots}'])#add legend to the plot
     plot_polynom(given_polynom, x_line)

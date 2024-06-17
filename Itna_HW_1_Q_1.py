@@ -17,7 +17,13 @@ import numpy as np
 import math
 from matplotlib import pyplot as plt
 
-
+# constant parameters
+precision_requierd = 10 ** (-4)  # ε
+a = -5  # begining of segment
+b = 3  # end of segment
+x_line = np.linspace(a, b, abs(b - a) * 10 ** 4)
+polynom_coefficients = [1, 2, -7, 0, 3]
+given_polynom = np.poly1d(polynom_coefficients)
 
 
 # function to calculate the value of a polynom in a given x
@@ -200,25 +206,32 @@ def plot_polynom(polynom, x_segment):
     plt.show()
 
 def main():
-    # constant parameters
-    precision_requierd = 10 ** (-4)  # ε
-    a = -5  # begining of segment
-    b = 3  # end of segment
-    x_line = np.linspace(a, b, abs(b - a) * 10 ** 4)
-    polynom_coefficients = [1, 2, -7, 0, 3]
-    given_polynom = np.poly1d(polynom_coefficients)
+    """"
+    The main function of the script.
+    making use of the functions above to find the roots of the given polynom
+    find the first root using bisection method and the rest using newton-raphson method and synthetic division method
+    comper to the analytical solution and check if the error is less than the required precision
+    and plot the polynom and the roots on the plot
+    """
+
+
     first_root_using_bisection  = bisection_search_first_guess(a, b, given_polynom, x_line, precision_requierd)#find the first root using bisection method
     print(f'The first root using bisection method is: {first_root_using_bisection}')
-    roots = []#find all the roots using newton-raphson method
+    roots_newton_raphson = []#find all the roots using newton-raphson method
     for i in np.linspace(a, b, abs(b - a) *2):
 
         new_root = round(newton_raphson_method(given_polynom, i),4)
-        roots.append(new_root)
-    roots = sorted(list(set(roots)))
-    print(f'The roots using Newton-Raphson method are: {roots}')
+        roots_newton_raphson.append(new_root)
+    roots = sorted(list(set(roots_newton_raphson)))
+    print(f'The roots using Newton-Raphson method are: {roots_newton_raphson}')
     #find all the roots using synthetic division method
 
+
+
+
     print(sorted(given_polynom.roots))
+
+
 
     for i in roots:
         plt.scatter(i, given_polynom(i), color='red')#mark the roots on the plot

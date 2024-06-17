@@ -26,7 +26,6 @@ polynom_coefficients = [1, 2, -7, 0, 3]
 given_polynom = np.poly1d(polynom_coefficients)
 analytical_solution_wolfram_alpha = [0.5*(1-math.sqrt(5)), 0.5*(1+math.sqrt(5)), 0.5*(-3-math.sqrt(21)), 0.5*(math.sqrt(21)-3)]#analytical solution from wolfram alpha
 
-
 # function to calculate the value of a polynom in a given x
 def derivative_polynom_in_x(polynom,x_0,epsilon):
     """
@@ -44,7 +43,6 @@ def derivative_polynom_in_x(polynom,x_0,epsilon):
     u = polynom(a)
     v = polynom(b)
     return (v-u)/epsilon
-
 
 #dvide a polynom by (x-x_0) where x_0 is a root of the polynom
 def polynom_devision(polynom, x_0):
@@ -70,11 +68,6 @@ Returns the result of dividing a polynomial by (x-x_0).
         quotient[i-1] = remainder
         remainder = polynom_coeff[i] + remainder*x_0
     return np.poly1d(quotient), remainder
-
-
-
-
-
 
 # bisection method for finding the first root of a polynom
 def bisection_search_first_guess(x_start,x_end,polynom, x_segment,epsilon):
@@ -150,8 +143,6 @@ def newton_raphson_method(polynom, x_0=0, epsilon=10**(-4)):
         x = x_1
         x_1 = x - polynom(x) / derivative_polynom_in_x(polynom,x,epsilon)
     return x_1
-
-
 
 #synthetic division for polynoms
 def synthetic_devision_method(polynom, x_0):
@@ -320,11 +311,6 @@ def main():
     plt.grid()
     plt.show()
     print("thank you for using the script")
-
-
-
-
-
 
 if __name__ == '__main__':
     main()

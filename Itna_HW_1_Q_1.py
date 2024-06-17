@@ -212,7 +212,7 @@ def main():
     making use of the functions above to find the roots of the given polynom
     find the first root using bisection method and the rest using newton-raphson method and synthetic division method
     comper to the analytical solution and check if the error is less than the required precision
-    compare btween the methods
+    compare between the roots found by the different methods
     and plot the polynom and the roots on the plot
     """
 

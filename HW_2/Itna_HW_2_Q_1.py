@@ -19,11 +19,120 @@ from tabulate import tabulate
 import numpy as np
 from scipy.linalg import lu
 from scipy.linalg import solve
-import time
+
 
 # Given parameters
 A = np.array([[3, -3, 2, -4], [-2, -1, 3, -1], [5, -2, -3, 2], [-2, 4, 1, 2]])
 b = np.array([7.9, -12.5, 18, -8.1])
 n = len(b)
 
-# Gauss elimination
+#gaeuss elimination method
+def gauss_elimination(A, b):
+    """
+    This function solves a system of linear equations using the Gauss elimination method
+    :param A: the matrix of coefficients
+    :param b: the vector of constants
+    :return: the solution vector, the augmented matrix, the number of operations
+    """
+
+    A = np.c_[A, b]# create the augmented matrix
+    num_operations = 0 # number of operations
+    # loop over the rows
+    for i in range(n):
+        # find the pivot
+        pivot = A[i, i]
+        # loop over the rows
+        for j in range(i + 1, n):
+            # find the factor
+            factor = A[j, i] / pivot
+            # loop over the columns
+            for k in range(n + 1):
+                # update the augmented matrix
+                A[j, k] = A[j, k] - factor * A[i, k]
+                num_operations += 1
+    # create the solution vector
+    x = np.zeros(n)
+    # loop over the rows
+    for i in range(n - 1, -1, -1):
+        # initialize the sum
+        sum = 0
+        # loop over the columns
+        for j in range(i + 1, n):
+            # update the sum
+            sum += A[i, j] * x[j]
+            num_operations += 1
+        # update the solution vector
+        x[i] = (A[i, n] - sum) / A[i, i]
+    return x,A, num_operations
+
+#LU decomposition method  with pivoting and without scipy library
+def lu_decomposition_steps(A, b):
+    """
+    This function solves a system of linear equations using the LU decomposition method
+    :param A: the matrix of coefficients
+    :param b: the vector of constants
+    :return: the solution vector, the number of operations
+    """
+    num_operations = 0
+    # create the augmented matrix
+    A = np.c_[A, b]
+    # create the L matrix
+    L = np.eye(n)
+    # create the U matrix
+    U = np.zeros((n, n))
+    # loop over the rows
+    for i in range(n):
+        # loop over the columns
+        for j in range(i, n):
+            # initialize the sum
+            sum = 0
+            # loop over the columns
+            for k in range(i):
+                # update the sum
+                sum += L[i, k] * U[k, j]
+                num_operations += 1
+            # update the U matrix
+            U[i, j] = A[i, j] - sum
+            num_operations += 1
+        # loop over the columns
+        for j in range(i + 1, n):
+            # initialize the sum
+            sum = 0
+            # loop over the columns
+            for k in range(i):
+                # update the sum
+                sum += L[j, k] * U[k, i]
+                num_operations += 1
+            # update the L matrix
+            L[j, i] = (A[j, i] - sum) / U[i, i]
+            num_operations += 1
+    # create the solution vector
+    y = np.zeros(n)
+    # loop over the rows
+    for i in range(n):
+        # initialize the sum
+        sum = 0
+        # loop over the columns
+        for j in range(i):
+            # update the sum
+            sum += L[i, j] * y[j]
+            num_operations += 1
+        # update the solution vector
+        y[i] = (A[i, n] - sum) / L[i, i]
+    # create the solution vector
+    x = np.zeros(n)
+    # loop over the rows
+    for i in range(n - 1, -1, -1):
+        # initialize the sum
+        sum = 0
+        # loop over the columns
+        for j in range(i + 1, n):
+            # update the sum
+            sum += U[i, j] * x[j]
+            num_operations += 1
+        # update the solution vector
+        x[i] = (y[i] - sum) / U[i, i]
+    return x, num_operations
+
+print(lu_decomposition_steps(A,b))
+

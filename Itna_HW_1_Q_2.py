@@ -15,8 +15,6 @@ with a precision requirement of 10⁻⁴.
 ---------------------------------------------------------------------------------
 """
 
-
-
 # Libraries in use
 import numpy as np
 import matplotlib.pyplot as plt
@@ -117,7 +115,6 @@ def main():
     plt.show()
     #save the plot
     fig.savefig("3D_graph_f(x,y)=sin(4y)cos(0.5x).png")
-
 
 if __name__ == "__main__":
     main()

@@ -115,6 +115,8 @@ def main():
     plt.show()
     #save the plot
     fig.savefig("3D_graph_f(x,y)=sin(4y)cos(0.5x).png")
+    print("\n")
+    print("thank you for using the script. have a nice day!")
 
 if __name__ == "__main__":
     main()

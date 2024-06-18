@@ -190,7 +190,7 @@ def print_roots_errors_for_diffrenent_method(analytical_roots , polynom ,methods
     analytical_roots = sorted(analytical_roots)
 
     if methods == "bisection":
-        print("***bisection***")
+        print("bisection:")
         one_root = bisection_search_first_guess(a, b, polynom, x_line, epsilon)
         count = 0
         absulute_error = []
@@ -215,7 +215,7 @@ def print_roots_errors_for_diffrenent_method(analytical_roots , polynom ,methods
         return one_root,analytical_one_root
 
     if methods == "newton_raphson":
-        print("***newton_raphson***")
+        print("newton_raphson:")
         roots_newton_raphson = []  # find all the roots using newton-raphson method
         for i in np.linspace(a, b,abs(b - a) * 10):  # seting the initial guess for the newton-raphson method using the segment in the x axis
             new_root = round(newton_raphson_method(given_polynom, i), 5)
@@ -245,7 +245,7 @@ def print_roots_errors_for_diffrenent_method(analytical_roots , polynom ,methods
         return roots_newton_raphson,analytical_roots
 
     if methods == "synthetic_division":
-        print("***synthetic_division***")
+        print("synthetic_division:")
         roots_synthetic_division = []  # find all the roots using synthetic division method
         for i in np.linspace(a, b,
                              abs(b - a) * 10):  # seting the initial guess for the synthetic division method using the segment in the x axis
@@ -278,25 +278,26 @@ def print_roots_errors_for_diffrenent_method(analytical_roots , polynom ,methods
 def main():
     """"
     The main function of the script.
-    making use of the functions above to find the roots of the given polynom
+    making use of the functions above to find the roots of the given polynom f(x) = X⁴ + 2x³ -7x² + 3
     find the first root using bisection method and the rest using newton-raphson method and synthetic division method
-    comper to the analytical solution and check if the error is less than the required precision
+    compare to the analytical solution and check if the error is less than the required precision
     compare between the roots found by the different methods
     and plot the polynom and the roots on the plot
     """
+
     methods = ["bisection", "newton_raphson", "synthetic_division"]
-    print(f'The given polynom is: {given_polynom}')
+    print(f'The given polynom is: f(x) = X⁴ + 2x³ -7x² + 3')
     print(f'The segment in the x axis is: [{a}:{b}]')
     print(f'The analytical roots are: {analytical_solution_wolfram_alpha}')
     print(f'The required precision is: {precision_requierd}')
     print(f'the methods used are: {methods}')
     print("")
-    print('################################################################################################################################')
+    print('------------------------------------------------------------------------------------------------------------------------------------')
     print("")
     for method in methods:
         print_roots_errors_for_diffrenent_method(analytical_solution_wolfram_alpha, given_polynom, method, precision_requierd)
         print("")
-        print('################################################################################################################################')
+        print('------------------------------------------------------------------------------------------------------------------------------------')
         print("")
 
     plt.figure(figsize=(8, 8))

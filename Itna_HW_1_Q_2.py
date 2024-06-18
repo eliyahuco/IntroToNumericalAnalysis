@@ -101,7 +101,7 @@ def main():
     print("The function to plot is: f(x, y) = sin(4y)cos(0.5x)")
     print("The range of x is: -10 < x < 10")
     print("The range of y is: -5 < y < 5")
-    print("the function will be plotted aotomatically.")
+    print("the graph will be displayed automatically.")
     print("the graph will be saved as '3D_graph_f(x,y)=sin(4y)cos(0.5x).png' in the current directory, and will be added to the submission.")
 # Plot the 3D graph
     fig = plt.figure(figsize=(8, 8))
@@ -116,6 +116,7 @@ def main():
     #save the plot
     fig.savefig("3D_graph_f(x,y)=sin(4y)cos(0.5x).png")
     print("\n")
+    print("the script has finished running.")
     print("thank you for using the script. have a nice day!")
 
 if __name__ == "__main__":

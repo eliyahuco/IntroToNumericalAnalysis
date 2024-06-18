@@ -300,7 +300,7 @@ def main():
         print('------------------------------------------------------------------------------------------------------------------------------------')
         print("")
 
-    plt.figure(figsize=(8, 8))
+    fig = plt.figure(figsize=(8, 8))
     for i in analytical_solution_wolfram_alpha:
         plt.scatter(i, given_polynom(i), color='red')#mark the roots on the plot
     plt.legend([f'Roots: {given_polynom.roots}'])#add legend to the plot
@@ -311,6 +311,13 @@ def main():
     plt.title('f(x) = X⁴ + 2x³ -7x² + 3')
     plt.grid()
     plt.show()
+    #save the plot
+    fig.savefig("graph_f(x)=X⁴+2x³-7x²+3.png")
+    print("the graph will be saved as 'graph_f(x)=X⁴+2x³-7x²+3.png' in the current directory, and will be added to the submission.")
+    print("the graph will be displayed automatically.")
+    print("the analytical roots are marked in red on the graph.")
+    print("\n")
+    print("the script has finished running")
     print("thank you for using the script")
 
 if __name__ == '__main__':

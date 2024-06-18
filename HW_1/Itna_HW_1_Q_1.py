@@ -312,8 +312,8 @@ def main():
     plt.grid()
     plt.show()
     #save the plot
-    fig.savefig("graph_f(x)=X⁴+2x³-7x²+3.png")
-    print("the graph will be saved as 'graph_f(x)=X⁴+2x³-7x²+3.png' in the current directory, and will be added to the submission.")
+    fig.savefig("graph_given_polynom_Q_1.png")
+    print("the graph will be saved as 'graph_given_polynom_Q_1.png' in the current directory, and will be added to the submission.")
     print("the graph will be displayed automatically.")
     print("the analytical roots are marked in red on the graph.")
     print("\n")

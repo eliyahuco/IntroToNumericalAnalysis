@@ -19,7 +19,7 @@ from matplotlib import pyplot as plt
 
 # constant parameters
 precision_requierd = 10 ** (-4)  # ε
-a = -5  # begining of segment
+a = -5  # beginning  of segment
 b = 3  # end of segment
 x_line = np.linspace(a, b, abs(b - a) * 10 ** 4)
 polynom_coefficients = [1, 2, -7, 0, 3]

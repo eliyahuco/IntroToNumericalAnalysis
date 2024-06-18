@@ -29,19 +29,19 @@ epsilon = 10**(-4)
 
 # Define the functions f(x, y) and g(x, y)
 def f(x, y):
-    return 4*y**2 + 4*y - 52*x - 1
+    return 4*y**2 + 4*y - 52*x - 19
 
 def g(x, y):
     return 169*x**2 + 3*y**2 - 111*x - 10*y
 
 # Define the partial derivative of the functions f(x, y) and g(x, y)
-def partial_derivative_of_function_2d(function, x, y, h = 10**-12):
+def partial_derivative_of_function_2d(function, x, y, h = 10**-9):
     df_dx = (function(x + h, y) - function(x, y)) / h
     df_dy = (function(x, y + h) - function(x, y)) / h
     return df_dx, df_dy
 
 # Define the Newton-Raphson method for simultaneous solution
-def newton_raphson_method_for_simultaneous_solution(f, g, x0, y0, epsilon = 10**-4):
+def newton_raphson_method_for_simultaneous_solution( x0, y0, epsilon = 10**-4):
     x = x0
     y = y0
     if abs(f(x, y)) < epsilon and abs(g(x, y)) < epsilon:
@@ -52,13 +52,7 @@ def newton_raphson_method_for_simultaneous_solution(f, g, x0, y0, epsilon = 10**
         jacobian = df_dx * dg_dy - df_dy * dg_dx
         x = x - (f(x, y) * dg_dy - g(x, y) * df_dy) / jacobian
         y = y - (g(x, y) * df_dx - f(x, y) * dg_dx) / jacobian
-    return x, y
-
-
-
-print(newton_raphson_method_for_simultaneous_solution(f, g, x0, y0, epsilon))
-print(f(-0.009629025334218142, 0.1122276298229395))
-print(g(-0.009629025334218142, 0.1122276298229395))
+    return x,y
 
 
 # Define the range of x and y
@@ -67,31 +61,33 @@ y = np.linspace(-5, 5, 1000)
 X, Y = np.meshgrid(x, y)
 function_to_plot = np.sin(4*Y)*np.cos(0.5*X)
 
-
-
+# Main function
 def main():
+    print("\n-------------------\n---Question 2.1:---\n-------------------")
     print("The system of equations is:")
     print("f(x, y) = 4y² + 4y - 52x - 1 = 0")
     print("g(x, y) = 169x² + 3y² - 111x - 10y = 0")
     print("The initial guess is: x0 = -0.01, y0 = -0.01")
     print("The precision requirement is: epsilon = 10⁻⁴")
+    print("\n")
     print("the value of f(x, y) anf g(x, y) at the initial guess is:")
     print("f(x0, y0) = ", f(x0, y0))
     print("g(x0, y0) = ", g(x0, y0), "\n")
 
     print("The solution of the system of equations is:")
-    print(newton_raphson_method_for_simultaneous_solution(f, g, x0, y0, epsilon))
+    print(newton_raphson_method_for_simultaneous_solution( x0, y0, epsilon))
 
-
+    print("\n-------------------\n---Question 2.2:---\n-------------------")
 # Plot the 3D graph
-    fig = plt.figure()
+    fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, function_to_plot, cmap='viridis')
+    ax.plot_surface(X, Y, function_to_plot, cmap='jet')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('f(x, y)')
     ax.set_title('f(x, y) = sin(4y)cos(0.5x)')
-    plt.show()
+
+    # plt.show()
 
 
 if __name__ == "__main__":

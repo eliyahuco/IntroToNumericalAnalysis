@@ -41,7 +41,6 @@ def inverse_matrix_with_lu_decomposition(A):
     return A_inverse, hw1.lu_decomposition_steps(A, I[:, i])[2], hw1.lu_decomposition_steps(A, I[:, i])[3]
 
 
-
 def main():
     # calculate the inverse of the matrix
     A_inv = inverse_matrix_with_lu_decomposition(A)
@@ -68,7 +67,6 @@ def main():
     print("\n")
     print("the script has finished running")
     print("thank you for using the script")
-
 
 if __name__ == "__main__":
     main()

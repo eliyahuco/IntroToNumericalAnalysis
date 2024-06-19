@@ -123,24 +123,16 @@ def lu_decomposition_steps(A, b):
     for i in range(n):# loop over the rows
         sum = 0# initialize the sum
         for j in range(i):# loop over the columns
-            # update the sum
-            sum += L[i, j] * y[j]
+            sum += L[i, j] * y[j]# update the sum
             num_operations += 1
-        # update the solution vector
-        y[i] = (A[i, n] - sum) / L[i, i]
-    # create the solution vector
-    x = np.zeros(n)
-    # loop over the rows
-    for i in range(n - 1, -1, -1):
-        # initialize the sum
-        sum = 0
-        # loop over the columns
-        for j in range(i + 1, n):
-            # update the sum
-            sum += U[i, j] * x[j]
+        y[i] = (A[i, n] - sum) / L[i, i]# update the solution vector
+    x = np.zeros(n)# create the solution vector
+    for i in range(n - 1, -1, -1):# loop over the rows
+        sum = 0# initialize the sum
+        for j in range(i + 1, n):# loop over the columns
+            sum += U[i, j] * x[j]# update the sum
             num_operations += 1
-        # update the solution vector
-        x[i] = (y[i] - sum) / U[i, i]
+        x[i] = (y[i] - sum) / U[i, i]# update the solution vector
     return x,A,L,U, num_operations
 
 #Gauss-Seidel method
@@ -160,51 +152,33 @@ def gauss_seidel(A, b, tol=1e-6):
         A, b = pivot_row(A, b, i)
         num_of_operations += 1
     x = np.ones(n)
-    # loop over the rows
-    for i in range(n):
-        # initialize the sum
-        sum = 0
-        # loop over the columns
-        for j in range(n):
-            # update the sum
-            if j != i:
+    for i in range(n):# loop over the rows
+        sum = 0# initialize the sum
+        for j in range(n):# loop over the columns
+            if j != i:# update the sum
                 sum += A[i, j] * x[j]
                 num_of_operations += 1
-
-        # update the solution vector
-        x[i] = (b[i] - sum) / A[i, i]
+        x[i] = (b[i] - sum) / A[i, i]# update the solution vector
         num_of_operations += 1
-    # create the previous solution vector
-    x_prev = np.zeros(n)
-    # loop over the rows
-    while np.linalg.norm(x - x_prev) > tol:
-        # update the previous solution vector
-        x_prev = x.copy()
-        # loop over the rows
-        for i in range(n):
-            # initialize the sum
-            sum = 0
-            # loop over the columns
-            for j in range(n):
-                # update the sum
-                if j != i:
+    x_prev = np.zeros(n)# create the previous solution vector
+    while np.linalg.norm(x - x_prev) > tol:# loop over the rows
+        x_prev = x.copy()# update the previous solution vector
+        for i in range(n):# loop over the rows
+            sum = 0# initialize the sum
+            for j in range(n):# loop over the columns
+                if j != i:# update the sum
                     sum += A[i, j] * x[j]
                     num_of_operations += 1
-            # update the solution vector
-            x[i] = (b[i] - sum) / A[i, i]
+            x[i] = (b[i] - sum) / A[i, i]# update the solution vector
             num_of_operations += 1
         num_iterations += 1
     return x, num_iterations, num_of_operations
 
 def get_user_input(prompt):
-    # Create the root window
-    root = tk.Tk()
-    # Hide the root window
-    root.withdraw()
-    # Show the input dialog and get the user's input
-    user_input = simpledialog.askstring(title="Input", prompt=prompt)
-    # Destroy the root window after getting the input
-    root.destroy()
+    root = tk.Tk()# Create the root window
+    root.withdraw()# Hide the root window
+    user_input = simpledialog.askstring(title="Input", prompt=prompt)# Show the input dialog and get the user's input
+    root.destroy()# Destroy the root window after getting the input
     return user_input
 
 def main():
@@ -245,9 +219,6 @@ def main():
         print("\n")
         print("the script has finished running")
         print("thank you for using the script")
-
-
-
 
 
 if __name__ == '__main__':

@@ -112,10 +112,8 @@ def lu_decomposition_steps(A, b):
     :param b: the vector of constants
     :return: the solution vector, the number of operations and the augmented matrix, the L matrix and the U matrix
     """
-    num_operations = 0
-
+    num_operations = 0 # number of operations
     A = np.c_[A, b]# create the augmented matrix
-
     L = np.eye(n)# create the L matrix
     # create the U matrix
     U = np.zeros((n, n))
@@ -175,8 +173,60 @@ def lu_decomposition_steps(A, b):
 
 
 print(lu_decomposition_steps(A,b)[0])
-print(tabulate(lu_decomposition_steps(A,b)[3], headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
+print(tabulate(lu_decomposition_steps(A,b)[2], headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
 
 print(np.dot(lu_decomposition_steps(A,b)[2],lu_decomposition_steps(A,b)[3]))
-#Gauss-Seidel method
 
+#Gauss-Seidel method
+def gauss_seidel(A, b, tol=1e-9):
+    """
+    This function solves a system of linear equations using the Gauss-Seidel method
+    :param A: the matrix of coefficients
+    :param b: the vector of constants
+    :param tol: the tolerance
+    :return: the solution vector
+    """
+    num_iterations = 0 # number of iterations
+    num_of_operations = 0 # number of operations
+    n = len(b)
+    for i in range(len(b)):
+        A, b = pivot_row(A, b, i)
+        num_of_operations += 1
+    x = np.ones(n)
+    # loop over the rows
+    for i in range(n):
+        # initialize the sum
+        sum = 0
+        # loop over the columns
+        for j in range(n):
+            # update the sum
+            if j != i:
+                sum += A[i, j] * x[j]
+                num_of_operations += 1
+
+        # update the solution vector
+        x[i] = (b[i] - sum) / A[i, i]
+        num_of_operations += 1
+    # create the previous solution vector
+    x_prev = np.zeros(n)
+    # loop over the rows
+    while np.linalg.norm(x - x_prev) > tol:
+        # update the previous solution vector
+        x_prev = x.copy()
+        # loop over the rows
+        for i in range(n):
+            # initialize the sum
+            sum = 0
+            # loop over the columns
+            for j in range(n):
+                # update the sum
+                if j != i:
+                    sum += A[i, j] * x[j]
+                    num_of_operations += 1
+            # update the solution vector
+            x[i] = (b[i] - sum) / A[i, i]
+            num_of_operations += 1
+        num_iterations += 1
+    return x, num_iterations, num_of_operations
+
+print('\nthe solution of the system of linear equations using gauss seidel method is:',gauss_seidel(A,b))

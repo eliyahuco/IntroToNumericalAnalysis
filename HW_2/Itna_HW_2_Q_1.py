@@ -26,6 +26,41 @@ A = np.array([[3, -3, 2, -4], [-2, -1, 3, -1], [5, -2, -3, 2], [-2, 4, 1, 2]])
 b = np.array([7.9, -12.5, 18, -8.1])
 n = len(b)
 
+def pivot_row(A, b, i):
+    """
+    This function pivots the rows of the matrix of coefficients and the vector of constants
+    :param A: the matrix of coefficients
+    :param b: the vector of constants
+    :param i: the row index
+    :return: the pivoted matrix of coefficients and the pivoted vector of constants
+    """
+    # find the pivot
+    pivot = A[i, i]
+    # loop over the rows
+    for j in range(i + 1, n):
+        # find the row with the maximum value
+        if abs(A[j, i]) > abs(pivot):
+            # update the pivot
+            pivot = A[j, i]
+            # pivot the rows
+            A[[i, j]] = A[[j, i]]
+            b[[i, j]] = b[[j, i]]
+    return A, b
+def rankin_matrix(A, b):
+    for i in range(len(b)):
+        A, b = pivot_row(A, b, i)
+        for j in range(i + 1, n):
+            factor = A[j, i] / A[i, i]
+            A[j] = A[j] - factor * A[i]
+            b[j] = b[j] - factor * b[i]
+
+    return A, b
+
+
+
+
+
+
 #gaeuss elimination method
 def gauss_elimination(A, b):
     """
@@ -34,7 +69,6 @@ def gauss_elimination(A, b):
     :param b: the vector of constants
     :return: the solution vector, the augmented matrix, the number of operations
     """
-
     A = np.c_[A, b]# create the augmented matrix
     num_operations = 0 # number of operations
     # loop over the rows
@@ -50,6 +84,7 @@ def gauss_elimination(A, b):
                 # update the augmented matrix
                 A[j, k] = A[j, k] - factor * A[i, k]
                 num_operations += 1
+    print(tabulate(A, headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
     # create the solution vector
     x = np.zeros(n)
     # loop over the rows
@@ -65,19 +100,23 @@ def gauss_elimination(A, b):
         x[i] = (A[i, n] - sum) / A[i, i]
     return x,A, num_operations
 
+print(gauss_elimination(A, b)[0])
+
+print(tabulate(gauss_elimination(A, b)[1], headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
+
 #LU decomposition method  with pivoting and without scipy library
 def lu_decomposition_steps(A, b):
     """
     This function solves a system of linear equations using the LU decomposition method
     :param A: the matrix of coefficients
     :param b: the vector of constants
-    :return: the solution vector, the number of operations
+    :return: the solution vector, the number of operations and the augmented matrix, the L matrix and the U matrix
     """
     num_operations = 0
-    # create the augmented matrix
-    A = np.c_[A, b]
-    # create the L matrix
-    L = np.eye(n)
+
+    A = np.c_[A, b]# create the augmented matrix
+
+    L = np.eye(n)# create the L matrix
     # create the U matrix
     U = np.zeros((n, n))
     # loop over the rows
@@ -132,7 +171,12 @@ def lu_decomposition_steps(A, b):
             num_operations += 1
         # update the solution vector
         x[i] = (y[i] - sum) / U[i, i]
-    return x, num_operations
+    return x,A,L,U, num_operations
 
-print(lu_decomposition_steps(A,b))
+
+print(lu_decomposition_steps(A,b)[0])
+print(tabulate(lu_decomposition_steps(A,b)[3], headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
+
+print(np.dot(lu_decomposition_steps(A,b)[2],lu_decomposition_steps(A,b)[3]))
+#Gauss-Seidel method
 

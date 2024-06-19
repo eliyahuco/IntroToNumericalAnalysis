@@ -242,6 +242,9 @@ def main():
         print(f'Number of iterations: {gauss_seidel(A, b)[1]}')
         print(f'Number of operations: {gauss_seidel(A, b)[2]}')
         print("the algorithm is in order of O(n²) operations, where n is the number of rows in the matrix of coefficients")
+        print("\n")
+        print("the script has finished running")
+        print("thank you for using the script")
 
 
 

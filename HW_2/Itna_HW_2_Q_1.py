@@ -17,8 +17,10 @@ the linear equations in matrix form are:
 
 from tabulate import tabulate
 import numpy as np
-from scipy.linalg import lu
+
 from scipy.linalg import solve
+import tkinter as tk
+from tkinter import simpledialog
 
 
 # Given parameters
@@ -79,12 +81,12 @@ def gauss_elimination(A, b):
         for j in range(i + 1, n):
             # find the factor
             factor = A[j, i] / pivot
+            num_operations += 1
             # loop over the columns
             for k in range(n + 1):
                 # update the augmented matrix
                 A[j, k] = A[j, k] - factor * A[i, k]
                 num_operations += 1
-    print(tabulate(A, headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
     # create the solution vector
     x = np.zeros(n)
     # loop over the rows
@@ -98,11 +100,10 @@ def gauss_elimination(A, b):
             num_operations += 1
         # update the solution vector
         x[i] = (A[i, n] - sum) / A[i, i]
+        num_operations += 1
     return x,A, num_operations
 
-print(gauss_elimination(A, b)[0])
 
-print(tabulate(gauss_elimination(A, b)[1], headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
 
 #LU decomposition method  with pivoting and without scipy library
 def lu_decomposition_steps(A, b):
@@ -172,13 +173,10 @@ def lu_decomposition_steps(A, b):
     return x,A,L,U, num_operations
 
 
-print(lu_decomposition_steps(A,b)[0])
-print(tabulate(lu_decomposition_steps(A,b)[2], headers=[f'x{i + 1}' for i in range(n)] + ['b']), '\n')
 
-print(np.dot(lu_decomposition_steps(A,b)[2],lu_decomposition_steps(A,b)[3]))
 
 #Gauss-Seidel method
-def gauss_seidel(A, b, tol=1e-9):
+def gauss_seidel(A, b, tol=1e-6):
     """
     This function solves a system of linear equations using the Gauss-Seidel method
     :param A: the matrix of coefficients
@@ -229,4 +227,52 @@ def gauss_seidel(A, b, tol=1e-9):
         num_iterations += 1
     return x, num_iterations, num_of_operations
 
-print('\nthe solution of the system of linear equations using gauss seidel method is:',gauss_seidel(A,b))
+
+
+def get_user_input(prompt):
+    # Create the root window
+    root = tk.Tk()
+    # Hide the root window
+    root.withdraw()
+    # Show the input dialog and get the user's input
+    user_input = simpledialog.askstring(title="Input", prompt=prompt)
+    # Destroy the root window after getting the input
+    root.destroy()
+    return user_input
+
+# Example usage
+# if __name__ == "__main__":
+#     user_input = get_user_input("Please enter your input:")
+#     print(f"User entered: {user_input}")
+
+
+def main():
+    """
+    This function runs the main program
+    """
+    # print the results
+    user_input = get_user_input("please choose the method you want to use: \n 1 for gauss elimination \n 2 for LU decomposition \n 3 for gauss-seidel \n")
+    if user_input == '1':
+        print('-Gauss Elimination Method-')
+        print("The solution vector is:")
+        print(gauss_elimination(A, b)[0])
+        print(f'Number of operations: {gauss_elimination(A, b)[2]}')
+        print("the algorithm is in order of O(n³) operations, where n is the number of rows in the matrix of coefficients")
+    elif user_input == '2':
+        print('-LU Decomposition Method-')
+        print("The solution vector is:")
+        print(lu_decomposition_steps(A, b)[0])
+        print(f'Number of operations: {lu_decomposition_steps(A, b)[4]}')
+        print("the algorithm is in order of O(²⁄₃n³) operations, where n is the number of rows in the matrix of coefficients")
+    elif user_input == '3':
+        print('-Gauss-Seidel Method-')
+        print("The solution vector is:")
+        print(gauss_seidel(A, b)[0])
+        print(f'Number of iterations: {gauss_seidel(A, b)[1]}')
+        print(f'Number of operations: {gauss_seidel(A, b)[2]}')
+        print("the algorithm is in order of O(n²) operations, where n is the number of rows in the matrix of coefficients")
+
+
+
+if __name__ == '__main__':
+    main()

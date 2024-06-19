@@ -38,17 +38,19 @@ def pivot_row(A, b, i):
     """
     # find the pivot
     pivot = A[i, i]
-    # loop over the rows
-    for j in range(i + 1, n):
-        # find the row with the maximum value
-        if abs(A[j, i]) > abs(pivot):
-            # update the pivot
-            pivot = A[j, i]
-            # pivot the rows
-            A[[i, j]] = A[[j, i]]
+    for j in range(i + 1, n):# loop over the rows
+        if abs(A[j, i]) > abs(pivot):# find the row with the maximum value
+            pivot = A[j, i]# update the pivot
+            A[[i, j]] = A[[j, i]]# pivot the rows
             b[[i, j]] = b[[j, i]]
     return A, b
 def rankin_matrix(A, b):
+    """
+    This function ranks the matrix of coefficients
+    :param A: the matrix of coefficients
+    :param b: the vector of constants
+    :return: the ranked matrix of coefficients and the ranked vector of constants
+    """
     for i in range(len(b)):
         A, b = pivot_row(A, b, i)
         for j in range(i + 1, n):
@@ -58,12 +60,8 @@ def rankin_matrix(A, b):
 
     return A, b
 
-
-
-
-
-
 #gaeuss elimination method
+#the algorithm is in order of O(n³) operations
 def gauss_elimination(A, b):
     """
     This function solves a system of linear equations using the Gauss elimination method
@@ -73,39 +71,28 @@ def gauss_elimination(A, b):
     """
     A = np.c_[A, b]# create the augmented matrix
     num_operations = 0 # number of operations
-    # loop over the rows
-    for i in range(n):
-        # find the pivot
-        pivot = A[i, i]
-        # loop over the rows
-        for j in range(i + 1, n):
-            # find the factor
-            factor = A[j, i] / pivot
+    for i in range(n):# loop over the rows
+        pivot = A[i, i]# find the pivot
+        for j in range(i + 1, n):# loop over the rows
+            factor = A[j, i] / pivot# find the factor
             num_operations += 1
-            # loop over the columns
-            for k in range(n + 1):
-                # update the augmented matrix
-                A[j, k] = A[j, k] - factor * A[i, k]
+            for k in range(n + 1):# loop over the columns
+                A[j, k] = A[j, k] - factor * A[i, k]# update the augmented matrix
                 num_operations += 1
-    # create the solution vector
-    x = np.zeros(n)
-    # loop over the rows
-    for i in range(n - 1, -1, -1):
-        # initialize the sum
-        sum = 0
-        # loop over the columns
-        for j in range(i + 1, n):
-            # update the sum
-            sum += A[i, j] * x[j]
+    x = np.zeros(n)# create the solution vector
+    for i in range(n - 1, -1, -1):# loop over the rows
+        sum = 0# initialize the sum
+        for j in range(i + 1, n):# loop over the columns
+            sum += A[i, j] * x[j]# update the sum
             num_operations += 1
-        # update the solution vector
-        x[i] = (A[i, n] - sum) / A[i, i]
+        x[i] = (A[i, n] - sum) / A[i, i] # update the solution vector
         num_operations += 1
     return x,A, num_operations
 
 
 
 #LU decomposition method  with pivoting and without scipy library
+#the algorithm is in order of O(²⁄₃n³) operations
 def lu_decomposition_steps(A, b):
     """
     This function solves a system of linear equations using the LU decomposition method
@@ -116,42 +103,26 @@ def lu_decomposition_steps(A, b):
     num_operations = 0 # number of operations
     A = np.c_[A, b]# create the augmented matrix
     L = np.eye(n)# create the L matrix
-    # create the U matrix
-    U = np.zeros((n, n))
-    # loop over the rows
-    for i in range(n):
-        # loop over the columns
-        for j in range(i, n):
-            # initialize the sum
-            sum = 0
-            # loop over the columns
-            for k in range(i):
-                # update the sum
-                sum += L[i, k] * U[k, j]
+    U = np.zeros((n, n))# create the U matrix
+    for i in range(n):# loop over the rows
+        for j in range(i, n):# loop over the columns
+            sum = 0# initialize the sum
+            for k in range(i):# loop over the columns
+                sum += L[i, k] * U[k, j]# update the sum
                 num_operations += 1
-            # update the U matrix
-            U[i, j] = A[i, j] - sum
+            U[i, j] = A[i, j] - sum# update the U matrix
             num_operations += 1
-        # loop over the columns
-        for j in range(i + 1, n):
-            # initialize the sum
-            sum = 0
-            # loop over the columns
-            for k in range(i):
-                # update the sum
-                sum += L[j, k] * U[k, i]
+        for j in range(i + 1, n):# loop over the columns
+            sum = 0# initialize the sum
+            for k in range(i):# loop over the columns
+                sum += L[j, k] * U[k, i]# update the sum
                 num_operations += 1
-            # update the L matrix
-            L[j, i] = (A[j, i] - sum) / U[i, i]
+            L[j, i] = (A[j, i] - sum) / U[i, i]# update the L matrix
             num_operations += 1
-    # create the solution vector
-    y = np.zeros(n)
-    # loop over the rows
-    for i in range(n):
-        # initialize the sum
-        sum = 0
-        # loop over the columns
-        for j in range(i):
+    y = np.zeros(n)# create the solution vector
+    for i in range(n):# loop over the rows
+        sum = 0# initialize the sum
+        for j in range(i):# loop over the columns
             # update the sum
             sum += L[i, j] * y[j]
             num_operations += 1
@@ -172,10 +143,8 @@ def lu_decomposition_steps(A, b):
         x[i] = (y[i] - sum) / U[i, i]
     return x,A,L,U, num_operations
 
-
-
-
 #Gauss-Seidel method
+#the algorithm is in order of O(n²) operations
 def gauss_seidel(A, b, tol=1e-6):
     """
     This function solves a system of linear equations using the Gauss-Seidel method
@@ -227,8 +196,6 @@ def gauss_seidel(A, b, tol=1e-6):
         num_iterations += 1
     return x, num_iterations, num_of_operations
 
-
-
 def get_user_input(prompt):
     # Create the root window
     root = tk.Tk()
@@ -240,37 +207,43 @@ def get_user_input(prompt):
     root.destroy()
     return user_input
 
-# Example usage
-# if __name__ == "__main__":
-#     user_input = get_user_input("Please enter your input:")
-#     print(f"User entered: {user_input}")
-
-
 def main():
     """
     This function runs the main program
     """
     # print the results
-    user_input = get_user_input("please choose the method you want to use: \n 1 for gauss elimination \n 2 for LU decomposition \n 3 for gauss-seidel \n")
+    user_input = get_user_input("please choose the number of themethod you want to use: \n 1 for gauss elimination \n 2 for LU decomposition \n 3 for gauss-seidel \n")
+    print("The linear equations in matrix form are:")
+    print("⎡ 3  -3  2 -4 ⎤ ⎡x₁⎤   ⎡ 7.9 ⎤ \n⎢-2  -1  3 -1 ⎢ ⎢x₂⎢   ⎢-12.5⎥ \n⎢ 5  -2 -3  2 ⎢ ⎢x₃⎢ = ⎢  18 ⎥ \n⎣-2   4  1  2 ⎦ ⎣x₄⎦   ⎣ -8.1⎦")
+    print("\n")
     if user_input == '1':
-        print('-Gauss Elimination Method-')
+        print('-Gauss Elimination Method-\n')
         print("The solution vector is:")
         print(gauss_elimination(A, b)[0])
+        print("\n")
         print(f'Number of operations: {gauss_elimination(A, b)[2]}')
         print("the algorithm is in order of O(n³) operations, where n is the number of rows in the matrix of coefficients")
     elif user_input == '2':
-        print('-LU Decomposition Method-')
+        print('-LU Decomposition Method-\n')
         print("The solution vector is:")
         print(lu_decomposition_steps(A, b)[0])
+        print("\n")
         print(f'Number of operations: {lu_decomposition_steps(A, b)[4]}')
         print("the algorithm is in order of O(²⁄₃n³) operations, where n is the number of rows in the matrix of coefficients")
+        print("\nThe L matrix is:\n")
+        print(lu_decomposition_steps(A, b)[2])
+        print("\nThe U matrix is:\n")
+        print(lu_decomposition_steps(A, b)[3])
     elif user_input == '3':
-        print('-Gauss-Seidel Method-')
+        print('-Gauss-Seidel Method-\n')
         print("The solution vector is:")
         print(gauss_seidel(A, b)[0])
+        print("\n")
         print(f'Number of iterations: {gauss_seidel(A, b)[1]}')
         print(f'Number of operations: {gauss_seidel(A, b)[2]}')
         print("the algorithm is in order of O(n²) operations, where n is the number of rows in the matrix of coefficients")
+
+
 
 
 

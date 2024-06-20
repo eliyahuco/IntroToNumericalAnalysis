@@ -17,7 +17,6 @@ the linear equations in matrix form are:
 
 from tabulate import tabulate
 import numpy as np
-
 from scipy.linalg import solve
 import tkinter as tk
 from tkinter import simpledialog
@@ -90,7 +89,6 @@ def gauss_elimination(A, b):
     return x,A, num_operations
 
 
-
 #LU decomposition method  with pivoting and without scipy library
 #the algorithm is in order of O(²⁄₃n³) operations
 def lu_decomposition_steps(A, b):
@@ -134,6 +132,7 @@ def lu_decomposition_steps(A, b):
             num_operations += 1
         x[i] = (y[i] - sum) / U[i, i]# update the solution vector
     return x,A,L,U, num_operations
+
 
 #Gauss-Seidel method
 #the algorithm is in order of O(n²) operations

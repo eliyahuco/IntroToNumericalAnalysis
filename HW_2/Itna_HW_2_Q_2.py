@@ -6,6 +6,8 @@ Short Description:
 
 This script is the HW_2 Question 1 in the course intro to numerical analysis
 the objective of this script is to find the inverse of a matrix using the LU decomposition method
+the script will use the LU decomposition from the HW_2 Question 1
+the script will calculate the inverse of the matrix
 and show the result to the user
 the matrix is:
 ⎡ 4  8  4  0 ⎤
@@ -42,6 +44,12 @@ def inverse_matrix_with_lu_decomposition(A):
 
 
 def main():
+    """
+    The main function of the script
+    :return: prints the inverse of the matrix and checks the result
+    """
+    print("\n the matrix is:\n")
+    print(tabulate(A, tablefmt='plain'))
     # calculate the inverse of the matrix
     A_inv = inverse_matrix_with_lu_decomposition(A)
     print("\nthe inverse of the matrix is:\n")

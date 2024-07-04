@@ -43,10 +43,8 @@ def craete_lagrange_polynomial(x_i, x, i, n = len(x_i)):
         if i != j:
             l_x = l_x * (x - x_i[j]) / (x_i[i] - x_i[j])
     return l_x
-for i in range(n):
-    for x in x_i:
-        print(f"The value of the Lagrange polynomial at x = {x} is and i = {i} is: {craete_lagrange_polynomial(x_i, x, i)}")
- def lagrange_interpolation_with_lagrange_polynomial(x_i, f, x, n = len(x_i)):
+
+def lagrange_interpolation_with_lagrange_polynomial(x_i, f, x, n = len(x_i)):
     """
     This function creates the Lagrange interpolation function
     :param x_i: the x values of the interpolation points
@@ -81,14 +79,36 @@ def lagrange_interpolation(x_i, f, x, n = len(x_i)):
             if i != j:
                 l_x = l_x * (x - x_i[j]) / (x_i[i] - x_i[j])
         # calculate the interpolation function
-        L_x = L_x + f[i] * l
+        L_x = L_x + f[i] * l_x
     return L_x
 
 
 
 
 def main():
-    pass
+    """
+    The main function of the script
+    :return: plots the interpolation functions
+    """
+    # create the interpolation functions
+    x_0 = np.linspace(-2, 5, 1000)
+    x_1 = np.linspace(-2, 2, 1000)
+    x_2 = np.linspace(2, 5, 1000)
+    L_x_0 = lagrange_interpolation(x_i, f, x_0) # Lagrange interpolation in order 4
+    L_x_1 = lagrange_interpolation(x_i[:3], f[:3], x_1, len(x_i[:3])) # Lagrange interpolation in order 2 for the first three points
+    L_x_2 = lagrange_interpolation(x_i[2:], f[2:], x_2, len(x_i[2:])) # Lagrange interpolation in order 3 for the last three points
+    # plot the interpolation functions
+    plt.figure(figsize=(10, 6))
+    plt.plot(x_0, L_x_0, label="Lagrange interpolation in order 4", color='r', linewidth=2, linestyle='--'  )
+    plt.plot(x_1, L_x_1, label="Lagrange interpolation in order 2", color='b')
+    plt.plot(x_2, L_x_2, label="Lagrange interpolation in order 2", color='g')
+    plt.scatter(x_i, f, color='black', label='Interpolation points', s=100)
+    plt.xlabel("x", fontweight='bold')
+    plt.ylabel("f(x)", fontweight='bold')
+    plt.legend(fontsize=20, loc='upper left')
+    plt.grid()
+    plt.title("Lagrange Interpolation", fontsize=16, color='b', fontweight='bold')
+    plt.show()
 
 
 if __name__ == '__main__':

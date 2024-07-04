@@ -27,6 +27,41 @@ n = len(x_i)
 
 import numpy as np
 
+def craete_lagrange_polynomial(x_i, x, i, n = len(x_i)):
+    """
+    This function creates the Lagrange polynomial
+    :param x_i: the x values of the interpolation points
+    :param x: the x value to interpolate
+    :param i: the index of the interpolation point
+    :param n: the number of interpolation points
+    :return: the value of the Lagrange polynomial at x
+    """
+    len(x_i)
+    l_x = 1 # initialize the Lagrange polynomial
+    for j in range(n):
+        # calculate the Lagrange polynomial
+        if i != j:
+            l_x = l_x * (x - x_i[j]) / (x_i[i] - x_i[j])
+    return l_x
+for i in range(n):
+    for x in x_i:
+        print(f"The value of the Lagrange polynomial at x = {x} is and i = {i} is: {craete_lagrange_polynomial(x_i, x, i)}")
+ def lagrange_interpolation_with_lagrange_polynomial(x_i, f, x, n = len(x_i)):
+    """
+    This function creates the Lagrange interpolation function
+    :param x_i: the x values of the interpolation points
+    :param f: the f values of the interpolation points
+    :param x: the x value to interpolate
+    :param n: the number of interpolation points
+    :return: the value of the interpolation function at x
+    """
+    n = len(x_i)
+    L_x = 0 # initialize the interpolation function
+    for i in range(n):
+        l_x = craete_lagrange_polynomial(x_i, x, i) # initialize the Lagrange polynomial
+        # calculate the interpolation function
+        L_x = L_x + f[i] * l_x
+    return L_x
 
 def lagrange_interpolation(x_i, f, x, n = len(x_i)):
     """
@@ -37,30 +72,17 @@ def lagrange_interpolation(x_i, f, x, n = len(x_i)):
     :param n: the number of interpolation points
     :return: the value of the interpolation function at x
     """
-    # initialize the interpolation function
-    L = 0
+    n = len(x_i)
+    L_x = 0 # initialize the interpolation function
     for i in range(n):
-        # initialize the Lagrange polynomial
-        l = 1
+        l_x = 1 # initialize the Lagrange polynomial
         for j in range(n):
             # calculate the Lagrange polynomial
             if i != j:
-                l = l * (x - x_i[j]) / (x_i[i] - x_i[j])
+                l_x = l_x * (x - x_i[j]) / (x_i[i] - x_i[j])
         # calculate the interpolation function
-        L = L + f[i] * l
-    return L
-print(lagrange_interpolation(x_i, f, 2.5))
-x = np.linspace(-1, 4, 1000)
-y = lagrange_interpolation(x_i, f, x, n)
-plt.figure(figsize=(8, 6))
-plt.plot(x, y, label="Lagrange interpolation", color='r')
-plt.scatter(x_i, f, label="Interpolation points", color='b')
-plt.xlabel('x', fontsize=14, fontweight='bold')
-plt.ylabel('f(x)', fontsize=14, fontweight='bold')
-plt.title('Lagrange interpolation', fontsize=16, fontweight='bold')
-plt.legend()
-plt.grid()
-plt.show()
+        L_x = L_x + f[i] * l
+    return L_x
 
 
 

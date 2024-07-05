@@ -415,7 +415,18 @@ def lagrange_interpolation(x_i, f, x):
         # calculate the interpolation function
         L_x = L_x + f[i] * l_x
     return L_x
-
+def get_interpolation_error(x, f_x, interpolation_function):
+    """
+    This function calculates the errors of the interpolation function
+    :param x: the x value to interpolate
+    :param f_x: the value of the function f(x) at x
+    :param interpolation_function: the value of the interpolation function at x
+    :return: the absolute error, the relative error, the relative error in percentage
+    """
+    abs_error = abs(f_x - interpolation_function)
+    rel_error = abs((f_x - interpolation_function) / f_x)
+    rel_error_percentage = abs((f_x - interpolation_function) / f_x) * 100
+    return abs_error, rel_error, rel_error_percentage
 
 
 

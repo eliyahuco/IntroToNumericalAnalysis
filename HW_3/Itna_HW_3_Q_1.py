@@ -98,18 +98,32 @@ def main():
     L_x_1 = lagrange_interpolation(x_i[:3], f[:3], x_1, len(x_i[:3])) # Lagrange interpolation in order 2 for the first three points
     L_x_2 = lagrange_interpolation(x_i[2:], f[2:], x_2, len(x_i[2:])) # Lagrange interpolation in order 3 for the last three points
     # plot the interpolation functions
-    plt.figure(figsize=(10, 6))
-    plt.plot(x_0, L_x_0, label="Lagrange interpolation in order 4", color='r', linewidth=2, linestyle='--'  )
-    plt.plot(x_1, L_x_1, label="Lagrange interpolation in order 2", color='b')
-    plt.plot(x_2, L_x_2, label="Lagrange interpolation in order 2", color='g')
-    plt.scatter(x_i, f, color='black', label='Interpolation points', s=100)
-    plt.xlabel("x", fontweight='bold')
-    plt.ylabel("f(x)", fontweight='bold')
-    plt.legend(fontsize=20, loc='upper left')
-    plt.grid()
-    plt.title("Lagrange Interpolation", fontsize=16, color='b', fontweight='bold')
-    plt.show()
+    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+    axs[0].plot(x_0, L_x_0, label="Lagrange interpolation in order 4", color='r', linewidth=2  )
+    axs[0].scatter(x_i, f, color='black', label='Interpolation points', s=50)
+    axs[0].set_xlabel("x", fontweight='bold', fontsize=14)
+    axs[0].set_ylabel("f(x)", fontweight='bold', fontsize=14)
+    axs[0].legend(fontsize=10, loc='upper left')
+    axs[0].grid()
+    axs[0].set_title("Lagrange Interpolation in order 4", fontsize=12, color='b', fontweight='bold')
 
+    axs[1].plot(x_1, L_x_1, label="Lagrange interpolation in order 2 for [-1,2]", color='b')
+    axs[1].plot(x_2, L_x_2, label="Lagrange interpolation in order 2 for [2,4]", color='g')
+    axs[1].scatter(x_i, f, color='black', label='Interpolation points', s=50)
+    axs[1].set_xlabel("x", fontweight='bold', fontsize=14)
+    axs[1].set_ylabel("f(x)", fontweight='bold', fontsize=14)
+    axs[1].legend(fontsize=10, loc='upper left')
+    axs[1].grid()
+    axs[1].set_title("Lagrange Interpolation in order 2 for [-1,2] and [2,4]", fontsize=12, color='b', fontweight='bold')
+    plt.tight_layout()
+    plt.show()
+    #save the plot
+    fig.savefig('Lagrange_Interpolation_HW_3_Q_1.png')
+
+    print("\n")
+    print("the script has finished running")
+    print("the plot is saved as: \"Lagrange_Interpolation_HW_3_Q_1.png\"")
+    print("thank you for using the script")
 
 if __name__ == '__main__':
     main()

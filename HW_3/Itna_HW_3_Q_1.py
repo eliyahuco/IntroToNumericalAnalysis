@@ -118,11 +118,11 @@ def main():
     plt.tight_layout()
     plt.show()
     #save the plot
-    fig.savefig('Lagrange_Interpolation_HW_3_Q_1.png')
+    fig.savefig('plot of Lagrange_Interpolation_HW_3_Q_1.png')
 
     print("\n")
     print("the script has finished running")
-    print("the plot is saved as: \"Lagrange_Interpolation_HW_3_Q_1.png\"")
+    print("the plot is saved as: \"plot of Lagrange_Interpolation_HW_3_Q_1.png\"")
     print("thank you for using the script")
 
 if __name__ == '__main__':

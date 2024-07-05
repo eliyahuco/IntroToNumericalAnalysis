@@ -464,6 +464,28 @@ def get_user_input_list(prompt):
             print("Invalid input. Please enter a list of numbers separated by spaces.")# Print an error message
     return user_input_list
 
+def get_user_input_matrix(prompt):
+    while True:
+        try:
+            user_input = get_user_input(prompt)# Get the user's input
+            user_input_matrix = np.array([list(map(float, row.split())) for row in user_input.split(";")])# Convert the input string to a matrix
+            break
+        except ValueError:# Handle the exception
+            print("Invalid input. Please enter a matrix of numbers separated by semicolons.")# Print an error message
+    return user_input_matrix
+
+def get_user_input_vector(prompt):
+    while True:
+        try:
+            user_input = get_user_input(prompt)# Get the user's input
+            user_input_vector = np.array(list(map(float, user_input.split())))# Convert the input string to a vector
+            break
+        except ValueError:# Handle the exception
+            print("Invalid input. Please enter a vector of numbers separated by spaces.")# Print an error message
+    return user_input_vector
+
+
+
 def main():
     pass
 

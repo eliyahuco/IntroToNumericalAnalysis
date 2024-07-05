@@ -98,6 +98,7 @@ def lu_decomposition_steps(A, b):
     :param b: the vector of constants
     :return: the solution vector, the number of operations and the augmented matrix, the L matrix and the U matrix
     """
+    n = len(b)
     num_operations = 0 # number of operations
     A = np.c_[A, b]# create the augmented matrix
     L = np.eye(n)# create the L matrix

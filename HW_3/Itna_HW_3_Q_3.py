@@ -71,4 +71,47 @@ def natural_cubic_spline(x_i, y_i):
     :return: the coefficients of the cubic spline and the interpolation function
     """
     n = len(x_i)
+    h = x_i[1:] - x_i[:-1]
+    # a is the coefficient of x^3
+    # b is the coefficient of x^2
+    # c is the coefficient of x
+    # d is the coefficient of the constant term
+    a = np.zeros(n)
+    b = np.zeros(n)
+    c = np.zeros(n)
+    d = np.zeros(n)
+    # create the tridiagonal matrix
+    A = np.zeros((n, n))
+    A[0, 0] = 1
+    A[n - 1, n - 1] = 1
+    for i in range(1, n - 1):
+        A[i, i - 1] = h[i - 1]
+        A[i, i] = 2 * (h[i - 1] + h[i])
+        A[i, i + 1] = h[i]
+
+def parametric_cubic_spline(x_i, y_i):
     pass
+
+def main():
+    """
+    The main function of the script
+    :return: plots the interpolation functions
+    """
+    # create the interpolation functions
+    a, b, c, d, x, y = natural_cubic_spline(x_i, y_i)
+    print(f'the coefficients of the cubic spline are: a = {a}, b = {b}, c = {c}, d = {d}')
+    plt.plot(x, y, label="cubic spline interpolation function", color='b')
+    plt.scatter(x_i, y_i, label="interpolation points", color='r')
+    plt.legend()
+    plt.show()
+
+    # create the interpolation functions
+    a, b, c, d, x, y = parametric_cubic_spline(x_i, y_i)
+    print(f'the coefficients of the cubic spline are: a = {a}, b = {b}, c = {c}, d = {d}')
+    plt.plot(x, y, label="cubic spline interpolation function", color='b')
+    plt.scatter(x_i, y_i, label="interpolation points", color='r')
+    plt.legend()
+    plt.show()
+
+if __name__ == '__main__':
+    main()

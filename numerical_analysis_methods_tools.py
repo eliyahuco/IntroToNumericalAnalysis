@@ -426,6 +426,36 @@ def get_user_input(prompt):
     root.destroy()# Destroy the root window after getting the input
     return user_input
 
+def get_user_input_float(prompt):
+    while True:
+        try:
+            user_input = float(get_user_input(prompt))# Get the user's input
+            break
+        except ValueError:# Handle the exception
+            print("Invalid input. Please enter a number.")# Print an error message
+    return user_input
+def get_user_input_int(prompt):
+    while True:
+        try:
+            user_input = int(get_user_input(prompt))# Get the user's input
+            break
+        except ValueError:# Handle the exception
+            print("Invalid input. Please enter a number.")# Print an error message
+    return user_input
+
+def get_user_input_list(prompt):
+    while True:
+        try:
+            user_input = get_user_input(prompt)# Get the user's input
+            user_input_list = list(map(float, user_input.split()))# Convert the input string to a list of floats
+            break
+        except ValueError:# Handle the exception
+            print("Invalid input. Please enter a list of numbers separated by spaces.")# Print an error message
+    return user_input_list
+
+def main():
+    pass
+
 
 
 
@@ -433,4 +463,4 @@ def get_user_input(prompt):
 
 
 if __name__ == '__main__':
-    pass
+    main()

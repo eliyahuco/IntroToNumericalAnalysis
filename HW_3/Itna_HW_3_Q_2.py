@@ -53,6 +53,12 @@ def main():
     plt.grid()
     plt.show()
 
+    print(f"The value of the function f(x) = cos(4πx) at x = 0.25 is: {np.cos(4 * np.pi * 0.25)}")
+    print(f"The value of the interpolation function at x = 0.25 is: {na_tools.lagrange_interpolation_with_lagrange_polynomial(x_i, f, 0.25)}")
+    print(f"The value of the function f(x) = cos(4πx) at x = 0.125 is: {np.cos(4 * np.pi * 0.125)}")
+    print(f"The value of the interpolation function at x = 0.125 is: {na_tools.lagrange_interpolation_with_lagrange_polynomial(x_i, f, 0.125)}")
+    print(f"The value of the function f(x) = cos(4πx) at x = 0.375 is: {np.cos(4 * np.pi * 0.375)}")
+
 
 
 if __name__ == '__main__':

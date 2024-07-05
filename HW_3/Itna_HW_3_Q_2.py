@@ -29,35 +29,17 @@ import numerical_analysis_methods_tools as na_tools
 
 
 # Given parameters
-x_i = np.array([0, 0.125, 0.25, 0.375, 0.5])
-f = np.cos(4 * np.pi * x_i)
-n = len(x_i)
-
+x_i_1 = np.array([0, 0.125, 0.25, 0.375, 0.5])
+x_i_2 = np.array([0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5])
+f = np.round(np.cos(4 * np.pi * x_i_1), 4)
+n = len(x_i_1)
+print(f)
 def main():
     # Define the x range from 0 to 0.5
     x = np.linspace(0, 0.5, 1000)
     f_x = np.cos(4 * np.pi * x)
     f_interpolation = np.zeros(len(x))
-    for i in range(len(x)):
-        f_interpolation[i] = na_tools.lagrange_interpolation_with_lagrange_polynomial(x_i, f, x[i])
 
-    # Plot the function f(x) = cos(4πx) and the interpolation function
-    plt.figure(figsize=(10, 6))
-    plt.plot(x, f_x, label="f(x) = cos(4πx)", color='b')
-    plt.plot(x, f_interpolation, label="Interpolation function", color='r')
-    plt.scatter(x_i, f, color='g')
-    plt.legend()
-    plt.xlabel('x')
-    plt.ylabel('f(x)')
-    plt.title('f(x) = cos(4πx) and the interpolation function')
-    plt.grid()
-    plt.show()
-
-    print(f"The value of the function f(x) = cos(4πx) at x = 0.25 is: {np.cos(4 * np.pi * 0.25)}")
-    print(f"The value of the interpolation function at x = 0.25 is: {na_tools.lagrange_interpolation_with_lagrange_polynomial(x_i, f, 0.25)}")
-    print(f"The value of the function f(x) = cos(4πx) at x = 0.125 is: {np.cos(4 * np.pi * 0.125)}")
-    print(f"The value of the interpolation function at x = 0.125 is: {na_tools.lagrange_interpolation_with_lagrange_polynomial(x_i, f, 0.125)}")
-    print(f"The value of the function f(x) = cos(4πx) at x = 0.375 is: {np.cos(4 * np.pi * 0.375)}")
 
 
 

@@ -63,31 +63,45 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
         x[i] = (d[i] - c[i] * x[i + 1]) / b[i]
     return x
 
+
+
 def natural_cubic_spline(x_i, y_i):
     """
-    This function creates the natural cubic spline interpolation function
+    This function creates the natural cubic spline interpolation function and gives the coefficients of the cubic spline
     :param x_i: the x values of the interpolation points
     :param y_i: the y values of the interpolation points
-    :return: the coefficients of the cubic spline and the interpolation function
+    :return: the coefficients of the cubic spline, the x values of the interpolation function, the y values of the interpolation function
     """
     n = len(x_i)
-    h = x_i[1:] - x_i[:-1]
-    # a is the coefficient of x^3
-    # b is the coefficient of x^2
-    # c is the coefficient of x
-    # d is the coefficient of the constant term
+    h = np.zeros(n - 1)
+    for i in range(n - 1):
+        h[i] = x_i[i + 1] - x_i[i]
     a = np.zeros(n)
-    b = np.zeros(n)
+    b = np.zeros(n - 1)
     c = np.zeros(n)
-    d = np.zeros(n)
-    # create the tridiagonal matrix
-    A = np.zeros((n, n))
-    A[0, 0] = 1
-    A[n - 1, n - 1] = 1
+    d = np.zeros(n - 1)
     for i in range(1, n - 1):
-        A[i, i - 1] = h[i - 1]
-        A[i, i] = 2 * (h[i - 1] + h[i])
-        A[i, i + 1] = h[i]
+        a[i] = 2 * (h[i - 1] + h[i])
+        b[i] = h[i]
+        c[i] = h[i - 1]
+        d[i] = 3 * ((y_i[i + 1] - y_i[i]) / h[i] - (y_i[i] - y_i[i - 1]) / h[i - 1])
+    # solve the system of linear tridiagonal matrix equations
+    c = tridiagonal_matrix_algorithm(c, a, b, d)
+    for i in range(1, n):
+        a[i] = y_i[i - 1]
+        b[i] = (y_i[i] - y_i[i - 1]) / h[i - 1] - h[i - 1] * (c[i] + 2 * c[i - 1]) / 3
+        c[i] = c[i - 1]
+        d[i] = (c[i] - c[i - 1]) / (3 * h[i - 1])
+    x = np.array([])
+    y = np.array([])
+    for i in range(n - 1):
+        x_i = np.linspace(x_i[i], x_i[i + 1], 100)
+        y_i = a[i] + b[i] * (x_i - x_i[i]) + c[i] * (x_i - x_i[i]) ** 2 + d[i] * (x_i - x_i[i]) ** 3
+        x = np.concatenate((x, x_i))
+        y = np.concatenate((y, y))
+    return a, b, c, d, x, y
+
+
 
 def parametric_cubic_spline(x_i, y_i):
     pass

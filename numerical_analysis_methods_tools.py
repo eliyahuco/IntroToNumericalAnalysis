@@ -20,14 +20,9 @@ from tkinter import simpledialog
 
 def derivative_polynom_in_x(polynom,x_0,epsilon):
     """
-    Returns the derivative of a given polynomial.
-
-    Args:
-        polynom (callable): The polynomial function to differentiate.
-
-    Returns:
-        callable: The derivative of the polynomial function.
-
+    This function calculates the derivative of a polynomial at a given point using the definition of the derivative.
+    The function receives the polynomial, the point x_0, and the step size epsilon.
+    The function returns the derivative of the polynomial at the point x_0.
     """
     a = x_0
     b = x_0 + epsilon

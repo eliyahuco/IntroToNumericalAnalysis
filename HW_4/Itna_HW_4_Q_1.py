@@ -25,3 +25,24 @@ we will compare the results of the accuracy of the integration methods and with 
 will use the file numerical_analysis_methods_tools.py for use functions from the previous assignments
 ---------------------------------------------------------------------------------
 """
+
+# Libraries in use
+import numpy as np
+import matplotlib.pyplot as plt
+import numerical_analysis_methods_tools as na_tools
+
+# Given parameters
+def trapezoidal_rule_integration(f, a, b, n):
+    """
+    This function calculates the integral of a function using the trapezoidal rule
+    :param f: the function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    h = (b - a) / n
+    x = np.linspace(a, b, n + 1)
+    y = f(x)
+    integral = h * (np.sum(y) - 0.5 * (y[0] + y[-1]))
+    return integral

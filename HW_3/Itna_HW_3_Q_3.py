@@ -135,18 +135,23 @@ def parametric_cubic_spline(x_i, y_i):
     return spline_coeffs_x, spline_coeffs_y, t
 
 def main():
+    """
+    The main function of the script
+    :return: plots the interpolation functions
+    """
+
     x_i = np.array([0, 2, 3, 4, 7, 8])
     y_i = np.array([4, 2, 8, 10, 4, -2])
     n = len(x_i)
 
     spline_coeffs = natural_cubic_spline(x_i, y_i)
-    print('The coefficients of the cubic spline are:')
+    print('\nThe coefficients of the cubic spline are:')
     print(spline_coeffs)
 
     x_segment = np.linspace(0, 8, 1000)
     y_segment = [evaluate_spline(x_i, spline_coeffs, xi)[0] for xi in x_segment]
 
-    fig, ax = plt.subplots(1, 3, figsize=(18, 8))
+    fig, ax = plt.subplots(1, 3, figsize=(18, 6))
     ax[0].plot(x_segment, y_segment, label='Cubic Spline Interpolation', color='b')
     ax[0].scatter(x_i, y_i, color='r', label='Interpolation Points')
     ax[0].set_title('Cubic Spline Interpolation', fontweight='bold', fontsize=14)
@@ -189,6 +194,7 @@ def main():
     ax[2].set_xlabel('x', fontweight='bold', fontsize=14)
     ax[2].set_ylabel('y', fontweight='bold', fontsize=14)
     ax[2].legend(fontsize = 8, loc='upper left')
+    plt.tight_layout()
     plt.show()
 
     # save the plot

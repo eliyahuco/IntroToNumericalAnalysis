@@ -46,6 +46,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 def tridiagonal_matrix_algorithm(a, b, c, d):
     """
     Solves a tridiagonal system of linear equations using the Thomas algorithm.
@@ -89,20 +92,19 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
 
     return x
 
-
-def natural_cubic_spline(x_i, y_i):
+def natural_cubic_spline(t, f_t):
     """
     Constructs a natural cubic spline interpolation for given data points.
 
     Parameters:
-    x_i (ndarray): x-coordinates of the data points.
-    y_i (ndarray): y-coordinates of the data points.
+    t (ndarray): Parameter values.
+    f_t (ndarray): Function values at the parameter values.
 
     Returns:
     spline_coeffs (ndarray): Coefficients of the cubic spline for each interval.
     """
-    n = len(x_i)
-    h = np.diff(x_i)
+    n = len(t)
+    h = np.diff(t)
 
     # Construct the tridiagonal system
     a = np.zeros(n)
@@ -115,110 +117,108 @@ def natural_cubic_spline(x_i, y_i):
         a[i] = 2 * (h[i - 1] + h[i])
         b[i - 1] = h[i]
         c[i] = h[i - 1]
-        alpha[i] = 3 * ((y_i[i + 1] - y_i[i]) / h[i] - (y_i[i] - y_i[i - 1]) / h[i - 1])
+        alpha[i] = 3 * ((f_t[i + 1] - f_t[i]) / h[i] - (f_t[i] - f_t[i - 1]) / h[i - 1])
 
     # Adjusting arrays for the tridiagonal solver
-    A = a[1:n - 1]
-    B = b[:n - 2]
+    A = a[1:n-1]
+    B = b[:n-2]
     C = c[2:n]
-    D = alpha[1:n - 1]
+    D = alpha[1:n-1]
 
     # Solve the tridiagonal system
     c_sol = tridiagonal_matrix_algorithm(C, A, B, D)
 
     # Insert the boundary conditions for c
     c = np.zeros(n)
-    c[1:n - 1] = c_sol
+    c[1:n-1] = c_sol
 
     # Calculate the b and d coefficients
     b = np.zeros(n - 1)
     d = np.zeros(n - 1)
-    a = y_i[:-1]
+    a = f_t[:-1]
 
     for i in range(n - 1):
-        b[i] = (y_i[i + 1] - y_i[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3
+        b[i] = (f_t[i + 1] - f_t[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3
         d[i] = (c[i + 1] - c[i]) / (3 * h[i])
 
     spline_coeffs = np.array([a, b, c[:-1], d]).T
     return spline_coeffs
 
-
-def evaluate_spline(x, spline_coeffs, xi):
+def evaluate_spline(t, spline_coeffs, ti):
     """
     Evaluates the cubic spline at a given point.
 
     Parameters:
-    x (ndarray): x-coordinates of the data points.
+    t (ndarray): Parameter values.
     spline_coeffs (ndarray): Coefficients of the cubic spline for each interval.
-    xi (float): x-coordinate at which to evaluate the spline.
+    ti (float): Parameter value at which to evaluate the spline.
 
     Returns:
-    yi (float): Interpolated y-coordinate at xi.
+    fi (float): Interpolated function value at ti.
     """
-    i = np.searchsorted(x, xi) - 1
+    i = np.searchsorted(t, ti) - 1
     i = np.clip(i, 0, len(spline_coeffs) - 1)
 
-    dx = xi - x[i]
+    dt = ti - t[i]
     a, b, c, d = spline_coeffs[i]
 
-    return a + b * dx + c * dx ** 2 + d * dx ** 3
+    return a + b * dt + c * dt ** 2 + d * dt ** 3
 
+def parametric_cubic_spline(x_i, y_i):
+    """
+    Constructs a parametric cubic spline interpolation for given data points.
+
+    Parameters:
+    x_i (ndarray): x-coordinates of the data points.
+    y_i (ndarray): y-coordinates of the data points.
+
+    Returns:
+    spline_coeffs_x (ndarray): Coefficients of the cubic spline for x(t).
+    spline_coeffs_y (ndarray): Coefficients of the cubic spline for y(t).
+    t (ndarray): Parameter values.
+    """
+    n = len(x_i)
+    t = np.linspace(0, 1, n)
+
+    # Natural cubic splines for x(t) and y(t)
+    spline_coeffs_x = natural_cubic_spline(t, x_i)
+    spline_coeffs_y = natural_cubic_spline(t, y_i)
+
+    return spline_coeffs_x, spline_coeffs_y, t
 
 # Example usage
-x = np.array([0, 2, 3, 4, 7, 8,10])
-y = np.array([4, 2, 8, 10, 4, -2,3])
-spline_coeffs = natural_cubic_spline(x_i, y_i)
+x = np.array([0, 2, 3, 4, 7, 8])
+y = np.array([4, 2, 8, 10, 4, -2])
 
-# Evaluate the spline at some points
-x_eval = np.linspace(0, 8, 100)
-y_eval = [evaluate_spline(x, spline_coeffs, xi) for xi in x_eval]
+spline_coeffs_x, spline_coeffs_y, t = parametric_cubic_spline(x, y)
 
-plt.plot(x_eval, y_eval, label="Cubic Spline")
+# Evaluate the parametric spline at some points
+t_eval = np.linspace(0, 1, 100)
+x_eval = [evaluate_spline(t, spline_coeffs_x, ti) for ti in t_eval]
+y_eval = [evaluate_spline(t, spline_coeffs_y, ti) for ti in t_eval]
+
+plt.plot(x_eval, y_eval, label="Parametric Cubic Spline")
+plt.scatter(x, y, color='red', label="Data Points")
+plt.legend()
+plt.show()
+
+#(xᵢ,yᵢ) = [(3,4), (2,3), (2.5,1), (4,2), (5,3.5), (4,4.5)]
+# for this section we will use parametric cubic spline interpolation
+# i add the first point to the end of the list to make the interpolation function a closed curve
+x_i = np.array([3, 2, 2.5, 4, 5, 4,3])
+y_i = np.array([4, 3, 1, 2, 3.5, 4.5,4])
+spline_coeffs_x, spline_coeffs_y, t = parametric_cubic_spline(x_i, y_i)
+
+# Evaluate the parametric spline at some points
+t_eval = np.linspace(0, 1, 100)
+x_eval = [evaluate_spline(t, spline_coeffs_x, ti) for ti in t_eval]
+y_eval = [evaluate_spline(t, spline_coeffs_y, ti) for ti in t_eval]
+
+plt.plot(x_eval, y_eval, label="Parametric Cubic Spline")
 plt.scatter(x_i, y_i, color='red', label="Data Points")
 plt.legend()
 plt.show()
 
-
-# def natural_cubic_spline(x_i, y_i):
-#     """
-#     This function creates the natural cubic spline interpolation function and gives the coefficients of the cubic spline
-#     :param x_i: the x values of the interpolation points
-#     :param y_i: the y values of the interpolation points
-#     :return: the coefficients of the cubic spline, the x values of the interpolation function, the y values of the interpolation function
-#     """
-#     n = len(x_i)
-#     h = np.zeros(n - 1)
-#     for i in range(n - 1):
-#         h[i] = x_i[i + 1] - x_i[i]
-#     a = np.zeros(n)
-#     b = np.zeros(n - 1)
-#     c = np.zeros(n)
-#     d = np.zeros(n - 1)
-#     for i in range(1, n - 1):
-#         a[i] = 2 * (h[i - 1] + h[i])
-#         b[i] = h[i]
-#         c[i] = h[i - 1]
-#         d[i] = 3 * ((y_i[i + 1] - y_i[i]) / h[i] - (y_i[i] - y_i[i - 1]) / h[i - 1])
-#     # solve the system of linear tridiagonal matrix equations
-#     c = tridiagonal_matrix_algorithm(c, a, b, d)
-#     for i in range(1, n):
-#         a[i] = y_i[i - 1]
-#         b[i] = (y_i[i] - y_i[i - 1]) / h[i - 1] - h[i - 1] * (c[i] + 2 * c[i - 1]) / 3
-#         c[i] = c[i - 1]
-#         d[i] = (c[i] - c[i - 1]) / (3 * h[i - 1])
-#     x = np.array([])
-#     y = np.array([])
-#     for i in range(n - 1):
-#         x_i = np.linspace(x_i[i], x_i[i + 1], 100)
-#         y_i = a[i] + b[i] * (x_i - x_i[i]) + c[i] * (x_i - x_i[i]) ** 2 + d[i] * (x_i - x_i[i]) ** 3
-#         x = np.concatenate((x, x_i))
-#         y = np.concatenate((y, y))
-#     return a, b, c, d, x, y
-#
-#
-
-def parametric_cubic_spline(x_i, y_i):
-    pass
 
 def main():
     """

@@ -424,6 +424,135 @@ def get_interpolation_error(x, f_x, interpolation_function):
     rel_error_percentage = abs((f_x - interpolation_function) / f_x) * 100
     return abs_error, rel_error, rel_error_percentage
 
+def change_function_limits_to_0_1(f, a, b):
+    """
+    This function changes the limits of the integral to (0,1)
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :return: the new function and the new limits
+    """
+    x = np.linspace(a, b, abs(b - a) * 1000)
+    h = b - a
+    etha = (x - a) / h
+    f_a = f(a)
+    f_b = f(b)
+    f_new = (1-etha)*f_a + etha*f_b
+    a = 0
+    b = 1
+    return h*f_new, h, a, b
+
+# function that changes the limits of the integral to (-1,1)
+
+def change_function_limits_to_minus_1_1(f, a, b):
+    """
+    This function changes the limits of the integral to (-1,1)
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :return: the new function and the new limits
+    """
+    x = np.linspace(a, b, abs(b - a) * 1000)
+    a_0 = (a + b) / 2
+    a_1 = (b - a) / 2
+    t = a_0 + a_1 * x
+    f = f(x)
+    f_t = f(t)
+    f_new = f_t
+    a = -1
+    b = 1
+    return a_*f_new, a_1, a, b
+
+
+#  function that changes the limits of function to (a,b) from (0,1)
+def change_function_limits_to_a_b_from_0_1(f, a, b):
+    """
+    This function changes the limits of the integral to (a,b)
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :return: the new function and the new limits
+    """
+    x = np.linspace(0, 1, abs(b - a) * 1000)
+    h = b - a
+    etha = (x - a) / h
+    f_a = f(a)
+    f_b = f(b)
+    f_new = f_a + (f_b - f_a) * etha
+    return f_new, h, a, b
+
+#  function that changes the limits of function to (a,b) from (-1,1)
+
+def change_function_limits_to_a_b_from_minus_1_1(f, a, b):
+    """
+    This function changes the limits of the integral to (a,b)
+    :param f: the function to integrate given as a numpy array
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :return: the new function and the new limits
+    """
+    x = np.linspace(-1, 1, abs(b - a) * 1000)
+    h = b - a
+    etha = (x - a) / h
+    f_a = f(a)
+    f_b = f(b)
+    f_new = 0.5 * (f_a + (f_b - f_a) * etha)
+    return f_new, h, a, b
+
+def trapezoidal_rule_integration(f, a, b, n = 1):
+    """
+    This function calculates the integral of a function using the trapezoidal rule
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    x = np.linspace(a, b, n+1)
+
+
+    integral = 0
+    h = (b - a)
+    if n == 1:
+        return 0.5 * h * (f(a) + f(b))
+    else:
+
+        for i in range(n):
+            a = x[i]
+            b = x[i + 1]
+            h = (b - a)
+            integral += 0.5 * h * (f(a) + f(b))
+    return integral
+
+
+def extrapolated_richardson_rule_integration(f,a,b,accuracy = 10**-7):
+    """
+    This function calculates the integral of a function using the extrapolated richardson rule
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param accuracy: the required accuracy
+    :return: the value of the integral
+    """
+    n = 1
+    k = 1
+    integral = trapezoidal_rule_integration(f, a, b, n)
+    integral_ = trapezoidal_rule_integration(f, a, b, 2*n)
+
+    b_h =((4**k)*integral_ - integral)/((4**k)-1)
+
+    while abs(integral - integral_) > accuracy:
+
+        n = 2*n
+        k = k + 1
+        integral = integral_
+        integral_ = trapezoidal_rule_integration(f, a, b, 2*n)
+        b_h =((4**k)*integral_ - integral)/((4**k)-1)
+
+    return b_h
+
+
+
 
 
 def get_user_input(prompt):

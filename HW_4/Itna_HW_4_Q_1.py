@@ -6,6 +6,7 @@ Short Description:
 
 This script is the Question 1 in HW_4 for the course intro to numerical analysis
 the objective of this script is to calaculate integrals using the following methods:
+
 1) trapezoidal rule
 2) extrapolated richardson's rule
 3) simpson's rule
@@ -13,14 +14,12 @@ the objective of this script is to calaculate integrals using the following meth
 5) gauss quadrature
 
 accuracy required: 10^-7
-the assignment has two sections:
-a) to calculate the integral of the function f(x) = e^(-x^2) from 0 to 2 using the methods 1 with 20 intervals equal in size and method 2
+
+to calculate the integral of the function f(x) = e^(-x^2) from 0 to 2 using the methods 1 with 20 intervals equal in size and method 2
 with iterations until the accuracy is reached
 we will compare the results of the accuracy of the integration methods and with the analytical solution
 
-b) to calculate the integral of the function f(x) = x*e^(2x) from 0 to 4 using the methods 1, 3, 4, 5
-we will find the number of intervals required for each method to reach the accuracy required
-we will compare the results of the accuracy of the integration methods and with the analytical solution
+
 
 will use the file numerical_analysis_methods_tools.py for use functions from the previous assignments
 ---------------------------------------------------------------------------------
@@ -29,6 +28,8 @@ import math
 
 # Libraries in use
 import numpy as np
+import scipy.special as sp
+from scipy import integrate
 import matplotlib.pyplot as plt
 import numerical_analysis_methods_tools as na_tools
 
@@ -120,14 +121,13 @@ def trapezoidal_rule_integration(f, a, b, n = 1):
     :param n: the number of intervals
     :return: the value of the integral
     """
-    x = np.linspace(a, b, n)
+    x = np.linspace(a, b, n+1)
     integral = 0
     h = (b - a)
     if n == 1:
         return 0.5 * h * (f(a) + f(b))
     else:
-
-        for i in range(n -1):
+        for i in range(n):
             a = x[i]
             b = x[i + 1]
             h = (b - a)
@@ -135,35 +135,104 @@ def trapezoidal_rule_integration(f, a, b, n = 1):
     return integral
 
 
-def simpson_third_rule_integration(f, a, b, n = 1):
+def extrapolated_richardson_rule_integration(f,a,b,accuracy = 10**-7):
     """
-    This function calculates the integral of a function using the Simpson's rule
+    This function calculates the integral of a function using the extrapolated richardson rule
     :param f: the function to integrate given as a lambda function
     :param a: the lower limit of the integral
     :param b: the upper limit of the integral
-    :param n: the number of intervals
+    :param accuracy: the required accuracy
     :return: the value of the integral
     """
-    x = np.linspace(a, b, n)
-    integral = 0
-    h = (b - a) / 2
-    c = (a + b) / 2
-    if n == 1:
-        return h / 3 * (f(a) + 4 * f(c) + f(b))
-    else:
-        for i in range(n - 1):
-            a = x[i]
-            b = x[i + 1]
-            c = (a + b) / 2
-            h = (b - a) / 2
-            integral += (h / 3) * (f(a) + 4 * f(c) + f(b))
-    return integral
+    n = 1
+    k = 1
+    integral = trapezoidal_rule_integration(f, a, b, n)
+    integral_ = trapezoidal_rule_integration(f, a, b, 2*n)
+
+    b_h =((4**k)*integral_ - integral)/((4**k)-1)
+
+    while abs(integral - integral_) > accuracy:
+
+        n = 2*n
+        k = k + 1
+        integral = integral_
+        integral_ = trapezoidal_rule_integration(f, a, b, 2*n)
+        b_h =((4**k)*integral_ - integral)/((4**k)-1)
+    print(f'\nacutacy requires after {k} iterations')
+
+    return b_h
 
 
 
 
-f = lambda x: math.exp(-x**2)
 
 
-print(trapezoidal_rule_integration(f, 0, 2, 10000))
-print(simpson_third_rule_integration(f, 0, 2, 10000))
+def main():
+    """
+    The main function of the script
+    :return: plots the interpolation functions
+    """
+    # given parameters
+    f = lambda x: np.exp(-x**2)
+    a = 0
+    b = 2
+    accuracy = 10**-7
+
+    # change the limits of the integral to (0,1)
+
+
+    # calculate the integral using the trapezoidal rule
+
+    print('\n' + '#' * 100)
+    print('Trapesoidal rule:')
+    integral_trapezoidal = trapezoidal_rule_integration(f, a, b, 20)
+    print(f'\nThe integral of the function f(x) = e^(-x^2) from 0 to 2 using the trapezoidal rule with 20 intervals is: {np.round(integral_trapezoidal,7)}')
+
+    # calculate the integral using the extrapolated richardson rule
+
+    print('\n' + '#' * 100)
+    print('Extrapolated richardson rule:')
+    integral_richardson = extrapolated_richardson_rule_integration(f, a, b, accuracy)
+    print(f'\nThe integral of the function f(x) = e^(-x^2) from 0 to 2 using the extrapolated richardson rule with accuracy 10^-7 is: {np.round(integral_richardson,7)}')
+
+    # calculate the integral using the the real value of the integral
+    print('\n' + '#' * 100)
+    print('the analytical solution of the integral:')
+    integral_real = (math.sqrt(math.pi) / 2) * (sp.erf(2) - sp.erf(0))
+    print(f'\nThe real value of the integral of the function f(x) = e^(-x^2) from 0 to 2 is: {integral_real}')
+    print('and it was calculated using the error function from the scipy library and the square root of pi')
+
+    print('\n' + '#' * 100)
+    print('Errors analysis:')
+    print(f'we wil round the errors to 7 decimal points acording to the accuracy required  {accuracy}\n')
+    print(f'The absolute error of the trapezoidal rule is: {np.round(abs(integral_real - integral_trapezoidal),7)}')
+    print(f'The relative error of the trapezoidal rule is: {np.round(abs((integral_real - integral_trapezoidal) / integral_real),7)}')
+    print(f'The relative error in percentage of the trapezoidal rule is: {np.round(abs((integral_real - integral_trapezoidal) / integral_real) * 100,7)} %')
+    print('' + '-' * 100)
+    print(f'The absolute error of the extrapolated richardson rule is: {np.round(abs(integral_real - integral_richardson),7)}')
+    print(f'The relative error of the extrapolated richardson rule is: {np.round(abs((integral_real - integral_richardson) / integral_real),7)}')
+    print(f'The relative error in percentage of the extrapolated richardson rule is: {np.round(abs((integral_real - integral_richardson) / integral_real) * 100,7)} %')
+    print('\n' + '#' * 100)
+
+    # plot the function
+    x = np.linspace(a, b, 1000)
+    f_x = f(x)
+    plt.plot(x, f_x, label="f(x) = e^(-x^2)", color='g')
+    plt.fill_between(x, f_x, color='g', alpha=0.2)
+
+    plt.legend(fontsize=10, loc='upper right')
+    plt.xlabel("x", fontweight='bold', fontsize=14)
+    plt.ylabel("f(x)", fontweight='bold', fontsize=14)
+    plt.title("The function f(x) = e^(-x^2)", fontweight='bold', fontsize=14)
+    plt.grid()
+    plt.show()
+
+    print("\n")
+    print("the script has finished running")
+    print("thank you for using the script")
+
+
+
+if __name__ == '__main__':
+    main()
+

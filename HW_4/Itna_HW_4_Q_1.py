@@ -125,13 +125,17 @@ def trapezoidal_rule_integration(f, a, b, n = 1):
     h = (b - a)
     if n == 1:
         return 0.5 * h * (f(a) + f(b))
-    for i in range(n - 1):
-        a = x[i]
-        b = x[i + 1]
-        integral += 0.5 * h * (f(a) + f(b))
+    else:
+
+        for i in range(n -1):
+            a = x[i]
+            b = x[i + 1]
+            h = (b - a)
+            integral += 0.5 * h * (f(a) + f(b))
     return integral
 
-def simpson_rule_integration(f, a, b, n =1 ):
+
+def simpson_third_rule_integration(f, a, b, n = 1):
     """
     This function calculates the integral of a function using the Simpson's rule
     :param f: the function to integrate given as a lambda function
@@ -146,18 +150,20 @@ def simpson_rule_integration(f, a, b, n =1 ):
     c = (a + b) / 2
     if n == 1:
         return h / 3 * (f(a) + 4 * f(c) + f(b))
-
-    for i in range(n - 1):
-        a = x[i]
-        b = x[i + 1]
-        c = (a + b) / 2
-        integral += h / 3 * (f(a) + 4 * f(c) + f(b))
+    else:
+        for i in range(n - 1):
+            a = x[i]
+            b = x[i + 1]
+            c = (a + b) / 2
+            h = (b - a) / 2
+            integral += (h / 3) * (f(a) + 4 * f(c) + f(b))
     return integral
 
 
 
 
-f = lambda x: math.exp(-x ** 2)
+f = lambda x: math.exp(-x**2)
 
-print(trapezoidal_rule_integration(f, 0, 2, 1))
-print(simpson_rule_integration(f, 0, 2, 1))
+
+print(trapezoidal_rule_integration(f, 0, 2, 20))
+print(simpson_third_rule_integration(f, 0, 2, 20))

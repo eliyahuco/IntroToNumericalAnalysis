@@ -165,5 +165,5 @@ def simpson_third_rule_integration(f, a, b, n = 1):
 f = lambda x: math.exp(-x**2)
 
 
-print(trapezoidal_rule_integration(f, 0, 2, 20))
-print(simpson_third_rule_integration(f, 0, 2, 20))
+print(trapezoidal_rule_integration(f, 0, 2, 10000))
+print(simpson_third_rule_integration(f, 0, 2, 10000))

@@ -82,7 +82,7 @@ print(integrate)
 a = 0
 b = 4
 n = 0
-accuracy = 10**-4
+accuracy = 10**-7
 while True:
     n += 1
     integral = simpson_third_rule_integration(f, a, b, n)

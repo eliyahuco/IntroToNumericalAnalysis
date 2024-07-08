@@ -54,6 +54,31 @@ def simpson_third_rule_integration(f, a, b, n = 1):
             integral += (h / 3) * (f(a) + 4 * f(c) + f(b))
     return integral
 
+def eight_tirds_simpson_rule_integration(f, a, b, n = 1):
+    """
+    This function calculates the integral of a function using the Simpson's rule
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    x = np.linspace(a, b, n+1)
+    integral = 0
+    h = (b - a) / 3
+
+    if n == 1:
+        return ((3/8)*h) * (f(a) + 3 * f(a +h) + 3 * f(a + 2*h) + f(b))
+    else:
+        for i in range(n ):
+            a = x[i]
+            b = x[i + 1]
+            c = (a + b) / 2
+            h = (b - a) / 3
+            integral += ((3/8)*h) * (f(a) + 3 * f(a +h) + 3 * f(a + 2*h) + f(b))
+    return integral
+
+
 def romberg_integration(f, a, b, n = 1):
     """
     This function calculates the integral of a function using the Romberg's rule
@@ -64,24 +89,80 @@ def romberg_integration(f, a, b, n = 1):
     :return: the value of the integral
     """
     r = np.zeros((n, n))
-    h = (b - a)
-    r[0, 0] = h / 2 * (f(a) + f(b))
+    h = b - a
+    r[0, 0] = 0.5 * h * (f(a) + f(b))
     for i in range(1, n):
-        h /= 2
-        r[i, 0] = r[i - 1, 0] / 2 + h * sum([f(a + (2 * k - 1) * h) for k in range(1, 2 ** i + 1)])
+        h = h / 2
+        sum = 0
+        for k in range(1, 2 ** i, 2):
+            sum += f(a + k * h)
+        r[i, 0] = 0.5 * r[i - 1, 0] + sum * h
         for j in range(1, i + 1):
             r[i, j] = r[i, j - 1] + (r[i, j - 1] - r[i - 1, j - 1]) / (4 ** j - 1)
     return r[n - 1, n - 1]
 
+dict_of_weights_for_quad = {2 :([-0.57735026, 0.57735026], [1, 1]),
+                            3 :([-0.77459667, 0, 0.77459667], [0.55555556, 0.88888889, 0.55555556]),
+                            4 :([-0.86113631, -0.33998104, 0.33998104, 0.86113631], [0.34785485, 0.65214515, 0.65214515, 0.34785485]),
+                            5 :([-0.90617985, -0.53846931, 0, 0.53846931, 0.90617985], [0.23692689, 0.47862867, 0.56888889, 0.47862867, 0.23692689]),
+                            6 :([-0.93246951, -0.66120939, -0.23861918, 0.23861918, 0.66120939, 0.93246951], [0.17132449, 0.36076157, 0.46791393, 0.46791393, 0.36076157, 0.17132449]),
+                            7 :([-0.94910791, -0.74153119, -0.40584515, 0, 0.40584515, 0.74153119, 0.94910791], [0.12948497, 0.27970540, 0.38183005, 0.41795918, 0.38183005, 0.27970540, 0.12948497]),
+                            8 :([-0.96028986, -0.79666648, -0.52553241, -0.18343464, 0.18343464, 0.52553241, 0.79666648, 0.96028986], [0.10122854, 0.22238103, 0.31370665, 0.36268378, 0.36268378, 0.31370665, 0.22238103, 0.10122854]),
+                            9 :([-0.96816024, -0.83603111, -0.61337143, -0.32425342, 0, 0.32425342, 0.61337143, 0.83603111, 0.96816024], [0.08127439, 0.18064816, 0.26061070, 0.31234708, 0.33023936, 0.31234708, 0.26061070, 0.18064816, 0.08127439]),
+                            10 :([-0.97390653, -0.86506337, -0.67940957, -0.43339539, -0.14887434, 0.14887434, 0.43339539, 0.67940957, 0.86506337, 0.97390653], [0.06667134, 0.14945135, 0.21908636, 0.26926672, 0.29552422, 0.29552422, 0.26926672, 0.21908636, 0.14945135, 0.06667134])}
 
-f = lambda x: x * np.exp(2 * x)
 
+def gauss_quadrature(f, a, b, n = 2):
+    """
+    This function calculates the integral of a function using the Gauss quadrature
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    dict_of_weights_for_quad = {2: ([-0.57735026, 0.57735026], [1, 1]),
+                                3: ([-0.77459667, 0, 0.77459667], [0.55555556, 0.88888889, 0.55555556]),
+                                4: ([-0.86113631, -0.33998104, 0.33998104, 0.86113631],[0.34785485, 0.65214515, 0.65214515, 0.34785485]),
+                                5: ([-0.90617985, -0.53846931, 0, 0.53846931, 0.90617985],
+                                    [0.23692689, 0.47862867, 0.56888889, 0.47862867, 0.23692689]),
+                                6: ([-0.93246951, -0.66120939, -0.23861918, 0.23861918, 0.66120939, 0.93246951],
+                                    [0.17132449, 0.36076157, 0.46791393, 0.46791393, 0.36076157, 0.17132449]),
+                                7: ([-0.94910791, -0.74153119, -0.40584515, 0, 0.40584515, 0.74153119, 0.94910791],
+                                    [0.12948497, 0.27970540, 0.38183005, 0.41795918, 0.38183005, 0.27970540,
+                                     0.12948497]),
+                                8: (
+                                [-0.96028986, -0.79666648, -0.52553241, -0.18343464, 0.18343464, 0.52553241, 0.79666648,
+                                 0.96028986],
+                                [0.10122854, 0.22238103, 0.31370665, 0.36268378, 0.36268378, 0.31370665, 0.22238103,
+                                 0.10122854]),
+                                9: ([-0.96816024, -0.83603111, -0.61337143, -0.32425342, 0, 0.32425342, 0.61337143,
+                                     0.83603111, 0.96816024],
+                                    [0.08127439, 0.18064816, 0.26061070, 0.31234708, 0.33023936, 0.31234708, 0.26061070,
+                                     0.18064816, 0.08127439]),
+                                10: ([-0.97390653, -0.86506337, -0.67940957, -0.43339539, -0.14887434, 0.14887434,
+                                      0.43339539, 0.67940957, 0.86506337, 0.97390653],
+                                     [0.06667134, 0.14945135, 0.21908636, 0.26926672, 0.29552422, 0.29552422,
+                                      0.26926672, 0.21908636, 0.14945135, 0.06667134])}
+    x, w = dict_of_weights_for_quad[n]
+    integral = 0
+    for i in range(n):
+        integral += w[i]*f(0.5*(b-a)*x[i] + 0.5*(b+a))
+    return 0.5 * (b - a) * integral
+
+
+
+
+f = lambda x: x*np.exp(2*x)
 integrate = lambda x: x*np.exp(2*x)/2 - np.exp(2*x)/4
 integrate = integrate(4) - integrate(0)
 print(integrate)
 a = 0
 b = 4
 n = 0
+print(eight_tirds_simpson_rule_integration(f, a, b, 100000))
+print(romberg_integration(f, a, b, 5))
+print(gauss_quadrature(f, a, b, 10))
 accuracy = 10**-7
 while True:
     n += 1
@@ -89,10 +170,30 @@ while True:
     if abs(integral - integrate) < accuracy:
         break
 print(f"simpson_third_rule_integration: {integral}, n: {n}")
-n = 0
+
+n= 0
 while True:
     n += 1
-    integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
+    integral = eight_tirds_simpson_rule_integration(f, a, b, n)
     if abs(integral - integrate) < accuracy:
         break
-print(f"trapezoidal_rule_integration: {integral}, n: {n}")
+print(f"eight_tirds_simpson_rule_integration: {integral}, n: {n}")
+
+n=0
+while True:
+    n += 1
+    integral = romberg_integration(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+print(f"romberg_integration: {integral}, n: {n}")
+
+n=2
+while True:
+    n += 1
+    integral = gauss_quadrature(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+    if n == 10:
+        print("not converging")
+        break
+

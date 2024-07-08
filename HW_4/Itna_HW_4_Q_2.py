@@ -144,59 +144,58 @@ def gauss_quadrature(f, a, b, n = 2):
                                       0.43339539, 0.67940957, 0.86506337, 0.97390653],
                                      [0.06667134, 0.14945135, 0.21908636, 0.26926672, 0.29552422, 0.29552422,
                                       0.26926672, 0.21908636, 0.14945135, 0.06667134])}
-    x, w = dict_of_weights_for_quad[n]
+    if n >10:
+        x,w = sp.roots_legendre(n)
+    else:
+        x, w = dict_of_weights_for_quad[n]
     integral = 0
     for i in range(n):
-        integral += w[i]*f(0.5*(b-a)*x[i] + 0.5*(b+a))
-    return 0.5*(b-a)*integral
+        integral += w[i] * f(0.5 * (b - a) * x[i] + 0.5 * (a + b))
+    return 0.5 * (b - a) * integral
 
 
+f = lambda x: x*np.exp(2*x)
+integrate = lambda x: x*np.exp(2*x)/2 - np.exp(2*x)/4
+integrate = integrate(4) - integrate(0)
+print(integrate)
+a = 0
+b = 4
+n = 0
 
+print(gauss_quadrature(f, a, b, 11))
+print(abs(integrate- gauss_quadrature(f,a,b,10)))
+accuracy = 10**-7
+while True:
+    n += 1
+    integral = simpson_third_rule_integration(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+print(f"simpson_third_rule_integration: {integral}, n: {n}")
 
-# f = lambda x: x*np.exp(2*x)
-# integrate = lambda x: x*np.exp(2*x)/2 - np.exp(2*x)/4
-# integrate = integrate(4) - integrate(0)
-# print(integrate)
-# a = 0
-# b = 4
-# n = 0
-# print(eight_tirds_simpson_rule_integration(f, a, b, 100000))
-# print(romberg_integration(f, a, b, 5))
-# print(gauss_quadrature(f, a, b, 10))
-# accuracy = 10**-7
-# while True:
-#     n += 1
-#     integral = simpson_third_rule_integration(f, a, b, n)
-#     if abs(integral - integrate) < accuracy:
-#         break
-# print(f"simpson_third_rule_integration: {integral}, n: {n}")
-#
-# n= 0
-# while True:
-#     n += 1
-#     integral = eight_tirds_simpson_rule_integration(f, a, b, n)
-#     if abs(integral - integrate) < accuracy:
-#         break
-# print(f"eight_tirds_simpson_rule_integration: {integral}, n: {n}")
-#
-# n=0
-# while True:
-#     n += 1
-#     integral = romberg_integration(f, a, b, n)
-#     if abs(integral - integrate) < accuracy:
-#         break
-# print(f"romberg_integration: {integral}, n: {n}")
-#
-# n=2
-# while True:
-#     n += 1
-#     integral = gauss_quadrature(f, a, b, n)
-#     if abs(integral - integrate) < accuracy:
-#         break
-#     if n == 10:
-#         print("not converging")
-#         break
-# print(f"gauss_quadrature: {integral}, n: {n}")
+n= 0
+while True:
+    n += 1
+    integral = eight_tirds_simpson_rule_integration(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+print(f"eight_tirds_simpson_rule_integration: {integral}, n: {n}")
+
+n=0
+while True:
+    n += 1
+    integral = romberg_integration(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+print(f"romberg_integration: {integral}, n: {n}")
+
+n=2
+while True:
+    n += 1
+    integral = gauss_quadrature(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+
+print(f"gauss_quadrature: {integral}, n: {n}")
 
 def main():
     pass

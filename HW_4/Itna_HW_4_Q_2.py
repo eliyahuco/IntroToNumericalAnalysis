@@ -164,7 +164,10 @@ n = 0
 
 print(gauss_quadrature(f, a, b, 11))
 print(abs(integrate- gauss_quadrature(f,a,b,10)))
+print(na_tools.trapezoidal_rule_integration(f, a, b, 100000))
+print(abs(integrate - na_tools.trapezoidal_rule_integration(f, a, b, 100000)))
 accuracy = 10**-7
+print(abs(integrate - na_tools.trapezoidal_rule_integration(f, a, b, 10**6)) < accuracy)
 while True:
     n += 1
     integral = simpson_third_rule_integration(f, a, b, n)
@@ -196,6 +199,18 @@ while True:
         break
 
 print(f"gauss_quadrature: {integral}, n: {n}")
+
+n = 100000
+while True:
+    if n < 500000:
+        n += 100000
+        integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
+    else:
+        n += 10000
+        integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
+    if abs(integral - integrate) < accuracy:
+        break
+print(f"trapezoidal_rule_integration: {integral}, n: {n}")
 
 def main():
     pass

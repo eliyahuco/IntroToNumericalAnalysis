@@ -516,11 +516,11 @@ def trapezoidal_rule_integration(f, a, b, n = 1):
     if n == 1:
         return 0.5 * h * (f(a) + f(b))
     else:
-
+        h = (b - a) / n
         for i in range(n):
             a = x[i]
             b = x[i + 1]
-            h = (b - a)
+
             integral += 0.5 * h * (f(a) + f(b))
     return integral
 

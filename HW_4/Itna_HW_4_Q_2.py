@@ -202,12 +202,10 @@ print(f"gauss_quadrature: {integral}, n: {n}")
 
 n = 100000
 while True:
-    if n < 500000:
-        n += 100000
-        integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
-    else:
-        n += 10000
-        integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
+
+    n += 100000
+    integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
+
     if abs(integral - integrate) < accuracy:
         break
 print(f"trapezoidal_rule_integration: {integral}, n: {n}")

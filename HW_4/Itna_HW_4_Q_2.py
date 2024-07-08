@@ -148,7 +148,7 @@ def gauss_quadrature(f, a, b, n = 2):
     integral = 0
     for i in range(n):
         integral += w[i]*f(0.5*(b-a)*x[i] + 0.5*(b+a))
-    return 0.5 * (b - a) * integral
+    return 0.5*(b-a)*integral
 
 
 
@@ -196,4 +196,5 @@ while True:
     if n == 10:
         print("not converging")
         break
+print(f"gauss_quadrature: {integral}, n: {n}")
 

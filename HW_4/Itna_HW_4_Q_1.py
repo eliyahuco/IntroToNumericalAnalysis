@@ -9,17 +9,12 @@ the objective of this script is to calaculate integrals using the following meth
 
 1) trapezoidal rule
 2) extrapolated richardson's rule
-3) simpson's rule
-4) romberg's rule
-5) gauss quadrature
 
 accuracy required: 10^-7
 
-to calculate the integral of the function f(x) = e^(-x^2) from 0 to 2 using the methods 1 with 20 intervals equal in size and method 2
-with iterations until the accuracy is reached
+to calculate the integral of the function f(x) = e^(-x^2) from 0 to 2 using the methods 1 with 20 intervals equal in size.
+also calculate the integral using method 2 with iterations until the accuracy is reached
 we will compare the results of the accuracy of the integration methods and with the analytical solution
-
-
 
 will use the file numerical_analysis_methods_tools.py for use functions from the previous assignments
 ---------------------------------------------------------------------------------
@@ -134,7 +129,6 @@ def trapezoidal_rule_integration(f, a, b, n = 1):
             integral += 0.5 * h * (f(a) + f(b))
     return integral
 
-
 def extrapolated_richardson_rule_integration(f,a,b,accuracy = 10**-7):
     """
     This function calculates the integral of a function using the extrapolated richardson rule
@@ -152,20 +146,14 @@ def extrapolated_richardson_rule_integration(f,a,b,accuracy = 10**-7):
     b_h =((4**k)*integral_ - integral)/((4**k)-1)
 
     while abs(integral - integral_) > accuracy:
-
         n = 2*n
-        k = k + 1
         integral = integral_
         integral_ = trapezoidal_rule_integration(f, a, b, 2*n)
         b_h =((4**k)*integral_ - integral)/((4**k)-1)
+        k = k + 1
     print(f'\nacutacy requires after {k} iterations')
 
     return b_h
-
-
-
-
-
 
 def main():
     """
@@ -231,8 +219,7 @@ def main():
     print("the script has finished running")
     print("thank you for using the script")
 
-
-
+    return
 if __name__ == '__main__':
     main()
 

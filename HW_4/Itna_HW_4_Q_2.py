@@ -154,64 +154,112 @@ def gauss_quadrature(f, a, b, n = 2):
     return 0.5 * (b - a) * integral
 
 
-f = lambda x: x*np.exp(2*x)
-integrate = lambda x: x*np.exp(2*x)/2 - np.exp(2*x)/4
-integrate = integrate(4) - integrate(0)
-print(integrate)
-a = 0
-b = 4
-n = 0
-
-print(gauss_quadrature(f, a, b, 11))
-print(abs(integrate- gauss_quadrature(f,a,b,10)))
-print(na_tools.trapezoidal_rule_integration(f, a, b, 100000))
-print(abs(integrate - na_tools.trapezoidal_rule_integration(f, a, b, 100000)))
-accuracy = 10**-7
-print(abs(integrate - na_tools.trapezoidal_rule_integration(f, a, b, 10**6)) < accuracy)
-while True:
-    n += 1
-    integral = simpson_third_rule_integration(f, a, b, n)
-    if abs(integral - integrate) < accuracy:
-        break
-print(f"simpson_third_rule_integration: {integral}, n: {n}")
-
-n= 0
-while True:
-    n += 1
-    integral = eight_tirds_simpson_rule_integration(f, a, b, n)
-    if abs(integral - integrate) < accuracy:
-        break
-print(f"eight_tirds_simpson_rule_integration: {integral}, n: {n}")
-
-n=0
-while True:
-    n += 1
-    integral = romberg_integration(f, a, b, n)
-    if abs(integral - integrate) < accuracy:
-        break
-print(f"romberg_integration: {integral}, n: {n}")
-
-n=2
-while True:
-    n += 1
-    integral = gauss_quadrature(f, a, b, n)
-    if abs(integral - integrate) < accuracy:
-        break
-
-print(f"gauss_quadrature: {integral}, n: {n}")
-
-n = 100000
-while True:
-
-    n += 100000
-    integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
-
-    if abs(integral - integrate) < accuracy:
-        break
-print(f"trapezoidal_rule_integration: {integral}, n: {n}")
-
+# compare the results of the accuracy of the integration methods and with the analytical solution
 def main():
-    pass
+    """
+    The main function of the script
+    :return: prints the results of the integration methods
+    """
+    # Given parameters
+    f = lambda x: x * np.exp(2 * x)
+    a = 0
+    b = 4
+    n = 50
+    accuracy = 10 ** -7
+    integrate = lambda x: x * np.exp(2 * x) / 2 - np.exp(2 * x) / 4
+    integrate = integrate(4) - integrate(0)
+    intervals_dict = {}
+    print('\n' + '#' * 100)
+    print(f'the analytical solution of the integral: {integrate}')
+    print('\n' + '#' * 100)
+    print('Trapezoidal rule:')
+    n = 100000
+    while True:
+        n += 100000
+        integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
+        if abs(integral - integrate) < accuracy:
+            break
+    print(f"trapezoidal rule integration: {integral}, for accuracy required we need {n} intervals")
+    n_trapz = n
+    intervals_dict['trapezoidal rule'] = n_trapz
+    print('\n' + '#' * 100)
+    print('Simpson third rule:')
+    n = 1
+    while True:
+        n += 1
+        integral = simpson_third_rule_integration(f, a, b, n)
+        if abs(integral - integrate) < accuracy:
+            break
+    print(f"simpson third rule integration: {integral}, for accuracy required we need {n} intervals")
+    n_simpson_third = n
+    intervals_dict['simpson third rule'] = n_simpson_third
+    print('\n' + '#' * 100)
+    print('Eight thirds simpson rule:')
+    n = 1
+    while True:
+        n += 1
+        integral = eight_tirds_simpson_rule_integration(f, a, b, n)
+        if abs(integral - integrate) < accuracy:
+            break
+    print(f"eight thirds simpson rule integration: {integral}, for accuracy required we need {n} intervals")
+    n_eight_thirds = n
+    intervals_dict['eight thirds simpson rule'] = n_eight_thirds
+    print('\n' + '#' * 100)
+    print('Romberg rule:')
+    n = 1
+    while True:
+        n += 1
+        integral = romberg_integration(f, a, b, n)
+        if abs(integral - integrate) < accuracy:
+            break
+    print(f"romberg rule integration: {integral}, for accuracy required we need {n} intervals")
+    n_romberg = n
+    intervals_dict['romberg rule'] = n_romberg
+    print('\n' + '#' * 100)
+    print('Gauss quadrature:')
+    n = 2
+    while True:
+        n += 1
+        integral = gauss_quadrature(f, a, b, n)
+        if abs(integral - integrate) < accuracy:
+            break
+    print(f"gauss quadrature integration: {integral}, for accuracy required we need {n} intervals")
+    n_gauss = n
+    intervals_dict['gauss quadrature'] = n_gauss
+    print('\n' + '#' * 100)
+
+    intervals_dict = {k: v for k, v in sorted(intervals_dict.items(), key=lambda item: item[1])}
+    print(f'in conclusion, the analytical solution of the integral is: {integrate}')
+    print(f'the number of intervals required for each method to reach the accuracy required is:\n')
+    for key, value in intervals_dict.items():
+        print(f'{key}: {value} intervals')
+    print(f'\nthe best method is: {list(intervals_dict.keys())[0]}')
+    print(f'the worst method is: {list(intervals_dict.keys())[-1]}')
+    print('\n' + '#' * 100)
+
+
+    # plot the results
+    intervals_dict.pop('trapezoidal rule')
+    print(f'we will plot the number of intervals required for each method to reach the accuracy required')
+    print(f'not including the trapezoidal rule method')
+    print(f'because the number of intervals required for the trapezoidal rule method is very high, and not in the same order of magnitude as the other methods')
+    print('\n' + '#' * 100)
+    fig, axs = plt.subplots(1, 1, figsize=(12, 8), sharey=True, sharex=True)
+    axs.bar(intervals_dict.keys(), intervals_dict.values(), color='b')
+    axs.set_title('Number of intervals required for each method to reach the accuracy required', fontweight='bold', fontsize=14)
+    axs.set_xlabel('Integration methods', fontweight='bold', fontsize=12)
+    axs.set_ylabel('Number of intervals', fontweight='bold', fontsize=12)
+    axs.grid()
+    plt.show()
+
+    print("\n")
+    print("the script has finished running")
+    print("thank you for using the script")
+
+
+
+
+
 
 
 if __name__ == '__main__':

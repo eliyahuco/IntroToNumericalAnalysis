@@ -255,10 +255,11 @@ def main():
     integrate = integrate(4) - integrate(0)
     integrate1 =(7 * np.exp(8) + 1) / 4
     print(f'the analytical solution of the integral: {integrate}')
-    print(f'the analytical solution of the integral: {integrate1}')
+    print(f'second way to calculate the analytical solution of the integral: {integrate1}')
     intervals_dict = {}
     print('\n' + '#' * 100)
     print(f'the analytical solution of the integral: {np.round(integrate, 7)}')
+    print(f'second way to calculate the analytical solution of the integral: (7e⁸ + 1)/4 = {integrate1}')
     print('\n' + '#' * 100)
     print('Trapezoidal rule:')
     n = 100000

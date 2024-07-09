@@ -187,60 +187,57 @@ import numpy as np
 
 
 def gauss_quadrature(f, a, b, n=2):
-    def legendre_polynomial(n):
-        if n == 0:
-            return np.poly1d([1])
-        elif n == 1:
-            return np.poly1d([1, 0])
+    """
+    This function calculates the integral of a function using the Gauss quadrature
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    dict_of_weights_for_quad = {2: ([-0.57735026, 0.57735026], [1, 1]),
+                                3: ([-0.77459667, 0, 0.77459667], [0.55555556, 0.88888889, 0.55555556]),
+                                4: ([-0.86113631, -0.33998104, 0.33998104, 0.86113631],[0.34785485, 0.65214515, 0.65214515, 0.34785485]),
+                                5: ([-0.90617985, -0.53846931, 0, 0.53846931, 0.90617985],
+                                    [0.23692689, 0.47862867, 0.56888889, 0.47862867, 0.23692689]),
+                                6: ([-0.93246951, -0.66120939, -0.23861918, 0.23861918, 0.66120939, 0.93246951],
+                                    [0.17132449, 0.36076157, 0.46791393, 0.46791393, 0.36076157, 0.17132449]),
+                                7: ([-0.94910791, -0.74153119, -0.40584515, 0, 0.40584515, 0.74153119, 0.94910791],
+                                    [0.12948497, 0.27970540, 0.38183005, 0.41795918, 0.38183005, 0.27970540,
+                                     0.12948497]),
+                                8: ([-0.96028986, -0.79666648, -0.52553241, -0.18343464, 0.18343464, 0.52553241, 0.79666648,
+                                     0.96028986],
+                                    [0.10122854, 0.22238103, 0.31370665, 0.36268378, 0.36268378, 0.31370665, 0.22238103,
+                                     0.10122854]),
+                                9: ([-0.96816024, -0.83603111, -0.61337143, -0.32425342, 0, 0.32425342, 0.61337143,
+                                     0.83603111, 0.96816024],
+                                    [0.08127439, 0.18064816, 0.26061070, 0.31234708, 0.33023936, 0.31234708, 0.26061070,
+                                     0.18064816, 0.08127439]),
+                                10: ([-0.97390653, -0.86506337, -0.67940957, -0.43339539, -0.14887434, 0.14887434,
+                                      0.43339539, 0.67940957, 0.86506337, 0.97390653],
+                                     [0.06667134, 0.14945135, 0.21908636, 0.26926672, 0.29552422, 0.29552422,
+                                      0.26926672, 0.21908636, 0.14945135, 0.06667134])}
 
-        P0 = np.poly1d([1])
-        P1 = np.poly1d([1, 0])
+    if n < 2:
+        raise ValueError("n must be at least 2")
+    if n >= 2 and n <= 10:
+        integral = 0
+        x, w = dict_of_weights_for_quad[n]
+        for i in range(n):
+            transform_roots = 0.5 * (x[i] + 1) * (b - a) + a
+            integral += w[i] * f(transform_roots)
+        return 0.5 * (b - a) * integral
+    else:
+        x, w = na_tools.legendre_roots(n), na_tools.legendre_weights(n)
 
-        for k in range(2, n + 1):
-            Pk = ((2 * k - 1) * np.poly1d([1, 0]) * P1 - (k - 1) * P0) / k
-            P0, P1 = P1, Pk
+        # Transform roots to the interval [a, b]
+        transformed_roots = 0.5 * (x + 1) * (b - a) + a
 
-        return Pk
+        # Apply the Gauss quadrature formula
+        integral = 0.5 * (b - a) * np.sum(w * f(transformed_roots))
+        return integral
 
-    def legendre_roots(n, tol=1e-12):
-        Pn = legendre_polynomial(n)
-        Pn_deriv = np.polyder(Pn)
-
-        x = np.cos(np.pi * (np.arange(n) + 0.5) / n)
-
-        for _ in range(100):
-            x_new = x - Pn(x) / Pn_deriv(x)
-            if np.all(np.abs(x - x_new) < tol):
-                break
-            x = x_new
-
-        return x
-
-    def legendre_weights(n):
-            roots = legendre_roots(n)
-            Pn = legendre_polynomial(n)
-            Pn_deriv = np.polyder(Pn)
-
-            weights = 2 / ((1 - roots ** 2) * (Pn_deriv(roots) ** 2))
-            return weights
-
-
-
-
-
-    roots = legendre_roots(n)
-    weights = legendre_weights(n)
-
-    # Transform roots to the interval [a, b]
-    transformed_roots = 0.5 * (roots + 1) * (b - a) + a
-
-    # Apply the Gauss quadrature formula
-    integral = 0.5 * (b - a) * np.sum(weights * f(transformed_roots))
-    return integral
-
-
-
-
+print(gauss_quadrature(lambda x: x * np.exp(2 * x), 0, 4, 11))
 
 # compare the results of the accuracy of the integration methods and with the analytical solution
 def main():
@@ -256,16 +253,19 @@ def main():
     accuracy = 10 ** -7
     integrate = lambda x: x * np.exp(2 * x) / 2 - np.exp(2 * x) / 4
     integrate = integrate(4) - integrate(0)
+    integrate1 =(7 * np.exp(8) + 1) / 4
+    print(f'the analytical solution of the integral: {integrate}')
+    print(f'the analytical solution of the integral: {integrate1}')
     intervals_dict = {}
     print('\n' + '#' * 100)
-    print(f'the analytical solution of the integral: {integrate}')
+    print(f'the analytical solution of the integral: {np.round(integrate, 7)}')
     print('\n' + '#' * 100)
     print('Trapezoidal rule:')
     n = 100000
     while True:
         n += 100000
         integral = na_tools.trapezoidal_rule_integration(f, a, b, n)
-        if abs(integral - integrate) < accuracy:
+        if abs(integral - integrate) <= accuracy:
             break
     print(f"trapezoidal rule integration: {integral}, for accuracy required we need {n} intervals")
     n_trapz = n
@@ -276,7 +276,7 @@ def main():
     while True:
         n += 1
         integral = simpson_third_rule_integration(f, a, b, n)
-        if abs(integral - integrate) < accuracy:
+        if abs(integral - integrate) <= accuracy:
             break
     print(f"simpson third rule integration: {integral}, for accuracy required we need {n} intervals")
     n_simpson_third = n
@@ -287,7 +287,7 @@ def main():
     while True:
         n += 1
         integral = eight_tirds_simpson_rule_integration(f, a, b, n)
-        if abs(integral - integrate) < accuracy:
+        if abs(integral - integrate) <= accuracy:
             break
     print(f"eight thirds simpson rule integration: {integral}, for accuracy required we need {n} intervals")
     n_eight_thirds = n
@@ -298,7 +298,7 @@ def main():
     while True:
         n += 1
         integral = romberg_integration(f, a, b, n)
-        if abs(integral - integrate) < accuracy:
+        if abs(integral - integrate) <= accuracy:
             break
     print(f"romberg rule integration: {integral}, for accuracy required we need {n} intervals")
     n_romberg = n
@@ -309,7 +309,7 @@ def main():
     while True:
         n += 1
         integral = gauss_quadrature(f, a, b, n)
-        if abs(integral - integrate) < accuracy:
+        if abs(integral - integrate) <= accuracy:
             break
     print(f"gauss quadrature integration: {integral}, for accuracy required we need {n} intervals")
     n_gauss = n

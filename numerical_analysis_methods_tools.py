@@ -551,6 +551,45 @@ def extrapolated_richardson_rule_integration(f,a,b,accuracy = 10**-7):
 
     return b_h
 
+def legendre_polynomial(n):
+        if n == 0:
+            return np.poly1d([1])
+        elif n == 1:
+            return np.poly1d([1, 0])
+
+        P0 = np.poly1d([1])
+        P1 = np.poly1d([1, 0])
+
+        for k in range(2, n + 1):
+            Pk = ((2 * k - 1) * np.poly1d([1, 0]) * P1 - (k - 1) * P0) / k
+            P0, P1 = P1, Pk
+
+        return Pk
+
+
+def legendre_roots(n, tol=1e-12):
+    Pn = legendre_polynomial(n)
+    Pn_deriv = np.polyder(Pn)
+
+    x = np.cos(np.pi * (np.arange(n) + 0.5) / n)
+
+    for _ in range(100):
+        x_new = x - Pn(x) / Pn_deriv(x)
+        if np.all(np.abs(x - x_new) < tol):
+            break
+        x = x_new
+
+    return x
+
+
+def legendre_weights(n):
+    roots = legendre_roots(n)
+    Pn = legendre_polynomial(n)
+    Pn_deriv = np.polyder(Pn)
+
+    weights = 2 / ((1 - roots ** 2) * (Pn_deriv(roots) ** 2))
+    return weights
+
 
 
 

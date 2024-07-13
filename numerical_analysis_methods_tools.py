@@ -552,6 +552,11 @@ def extrapolated_richardson_rule_integration(f,a,b,accuracy = 10**-7):
     return b_h
 
 def legendre_polynomial(n):
+        """
+        This function calculates the nth-order Legendre polynomial using the recursive formula
+        :param n: the order of the Legendre polynomial
+        :return: the nth-order Legendre polynomial
+        """
         if n == 0:
             return np.poly1d([1])
         elif n == 1:
@@ -568,6 +573,12 @@ def legendre_polynomial(n):
 
 
 def legendre_roots(n, tol=1e-12):
+    """
+    This function calculates the roots of the nth-order Legendre polynomial using Newton's method
+    :param n: the order of the Legendre polynomial
+    :param tol: the tolerance
+    :return: the roots of the nth-order Legendre polynomial
+    """
     Pn = legendre_polynomial(n)
     Pn_deriv = np.polyder(Pn)
 
@@ -583,6 +594,11 @@ def legendre_roots(n, tol=1e-12):
 
 
 def legendre_weights(n):
+    '''
+    This function calculates the weights of the Gauss-Legendre quadrature
+    :param n: the number of points
+    :return: the weights
+    '''
     roots = legendre_roots(n)
     Pn = legendre_polynomial(n)
     Pn_deriv = np.polyder(Pn)

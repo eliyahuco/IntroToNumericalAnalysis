@@ -27,76 +27,79 @@ will use the file numerical_analysis_methods_tools.py for use functions from the
 ---------------------------------------------------------------------------------
 """
 
-# Define the shear force function s(x)
+
 import numpy as np
 import matplotlib.pyplot as plt
-# Import your custom methods if needed, e.g., from numerical_analysis_methods_tools import euler_method
-
-# Define the shear force function s(x)
-def shear_force(x):
-    return 10 - 2*x
-
-# Define the ODE function
-def ode(x, m):
-    return shear_force(x)
 
 # Euler's Method
-def euler_method(x0, m0, h, xmax):
+def euler_method_ode(ode_func, x0, y0, h, xmax):
     x_values = np.arange(x0, xmax + h, h)
-    m_values = [m0]
-    m = m0
+    y_values = [y0]
+    y = y0
     for x in x_values[:-1]:
-        m += h * ode(x, m)
-        m_values.append(m)
-    return x_values, np.array(m_values)
+        y += h * ode_func(x, y)
+        y_values.append(y)
+    return x_values, np.array(y_values)
 
 # Runge-Kutta Second Order Method (RK2)
-def rk2_method(x0, m0, h, xmax):
+def rk2_method(ode_func, x0, y0, h, xmax):
     x_values = np.arange(x0, xmax + h, h)
-    m_values = [m0]
-    m = m0
+    y_values = [y0]
+    y = y0
     for x in x_values[:-1]:
-        k1 = h * ode(x, m)
-        k2 = h * ode(x + h/2, m + k1/2)
-        m += k2
-        m_values.append(m)
-    return x_values, np.array(m_values)
+        k1 = h * ode_func(x, y)
+        k2 = h * ode_func(x + h/2, y + k1/2)
+        y += k2
+        y_values.append(y)
+    return x_values, np.array(y_values)
 
-# Analytical Solution (you'll need to derive this based on the given ODE)
+# Analytical Solution
 def analytical_solution(x):
-    return 10*x - x**2
+    # Placeholder for analytical solution, should be defined according to the problem
+    return 10*x - x**2  # Replace this with the actual analytical solution if available
 
-# Initial conditions
-x0 = 0
-m0 = 0
-xmax = 10
+# Main function to execute the code
+def main():
+    # Define the ODE function: dy/dx = f(x, y)
+    def ode_func(x, y):
+        # Example ODE: dy/dx = 10 - 2*x (you can replace this with any ODE)
+        return 10 - 2*x
 
-# Step sizes for Euler's method
-h_values = [0.05, 0.25]
+    # Initial conditions
+    x0 = 0
+    y0 = 0
+    xmax = 10
 
-# Plot results
-plt.figure(figsize=(10, 6))
+    # Step sizes for Euler's method
+    h_values = [0.05, 0.25]
 
-# Euler's method results
-for h in h_values:
-    x_euler, m_euler = euler_method(x0, m0, h, xmax)
-    plt.plot(x_euler, m_euler, label=f"Euler's Method h={h}")
+    # Plot results
+    plt.figure(figsize=(10, 6))
 
-# RK2 method results
-x_rk2, m_rk2 = rk2_method(x0, m0, 0.05, xmax)
-plt.plot(x_rk2, m_rk2, label="RK2 Method h=0.05", linestyle='--')
+    # Euler's method results
+    for h in h_values:
+        x_euler, y_euler = euler_method_ode(ode_func, x0, y0, h, xmax)
+        plt.plot(x_euler, y_euler, label=f"Euler's Method h={h}")
 
-# Analytical solution
-x_analytical = np.linspace(x0, xmax, 1000)
-m_analytical = analytical_solution(x_analytical)
-plt.plot(x_analytical, m_analytical, label="Analytical Solution", linestyle='dotted')
+    # RK2 method results
+    x_rk2, y_rk2 = rk2_method(ode_func, x0, y0, 0.05, xmax)
+    plt.plot(x_rk2, y_rk2, label="RK2 Method h=0.05", linestyle='--')
 
-# Customize plot
-plt.xlabel('Position x (meters)')
-plt.ylabel('Momentum m')
-plt.title('Comparison of Numerical Methods and Analytical Solution')
-plt.legend()
-plt.grid(True)
+    # Analytical solution (if available)
+    x_analytical = np.linspace(x0, xmax, 1000)
+    y_analytical = analytical_solution(x_analytical)
+    plt.plot(x_analytical, y_analytical, label="Analytical Solution", linestyle='dotted')
 
-# Show plot
-plt.show()
+    # Customize plot
+    plt.xlabel('Position x (meters)', fontsize=12, fontweight='bold')
+    plt.ylabel('Dependent Variable M(x)', fontsize=12, fontweight='bold')
+    plt.title('Comparison of Numerical Methods and Analytical Solution', fontsize=14, fontweight='bold')
+    plt.legend(fontsize=10, loc='upper right')
+    plt.grid(True)
+
+    # Show plot
+    plt.show()
+
+# Execute the main function
+if __name__ == "__main__":
+    main()

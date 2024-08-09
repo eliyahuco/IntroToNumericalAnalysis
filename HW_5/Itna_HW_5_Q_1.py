@@ -47,27 +47,23 @@ def rk2_method(ode_func, x0, y0, h, xmax):
     y_values = [y0]
     y = y0
     for x in x_values[:-1]:
-        k1 = h * ode_func(x, y)
-        k2 = h * ode_func(x + h/2, y + k1/2)
-        y += k2
+        f1 = ode_func(x, y)
+        f2 = ode_func(x + h, y + h * f1)
+        y += h * (f1 + f2) / 2
         y_values.append(y)
     return x_values, np.array(y_values)
 
-# Analytical Solution
-def analytical_solution(x):
-    # Placeholder for analytical solution, should be defined according to the problem
-    return 10*x - x**2  # Replace this with the actual analytical solution if available
 
 # Main function to execute the code
 def main():
-    # Define the ODE function: dy/dx = f(x, y)
-    def ode_func(x, y):
-        # Example ODE: dy/dx = 10 - 2*x (you can replace this with any ODE)
-        return 10 - 2*x
+    def analytical_solution(x):
+        return 10 * x - x ** 2
 
+    def ode_func(x, m):
+        return 10 - 2*x
     # Initial conditions
     x0 = 0
-    y0 = 0
+    mo = 0
     xmax = 10
 
     # Step sizes for Euler's method
@@ -78,11 +74,11 @@ def main():
 
     # Euler's method results
     for h in h_values:
-        x_euler, y_euler = euler_method_ode(ode_func, x0, y0, h, xmax)
+        x_euler, y_euler = euler_method_ode(ode_func, x0, mo, h, xmax)
         plt.plot(x_euler, y_euler, label=f"Euler's Method h={h}")
 
     # RK2 method results
-    x_rk2, y_rk2 = rk2_method(ode_func, x0, y0, 0.05, xmax)
+    x_rk2, y_rk2 = rk2_method(ode_func, x0, mo, 0.05, xmax)
     plt.plot(x_rk2, y_rk2, label="RK2 Method h=0.05", linestyle='--')
 
     # Analytical solution (if available)
@@ -96,9 +92,11 @@ def main():
     plt.title('Comparison of Numerical Methods and Analytical Solution', fontsize=14, fontweight='bold')
     plt.legend(fontsize=10, loc='upper right')
     plt.grid(True)
-
-    # Show plot
     plt.show()
+
+
+    print("\n")
+    print("the script has finished running")
 
 # Execute the main function
 if __name__ == "__main__":

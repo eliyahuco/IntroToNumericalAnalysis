@@ -784,6 +784,27 @@ def get_user_input_vector(prompt):
     return user_input_vector
 
 
+def euler_method_ode(ode_func, x0, y0, h, xmax):
+    x_values = np.arange(x0, xmax + h, h)
+    y_values = [y0]
+    y = y0
+    for x in x_values[:-1]:
+        y += h * ode_func(x, y)
+        y_values.append(y)
+    return x_values, np.array(y_values)
+
+# Runge-Kutta Second Order Method (RK2)
+def rk2_method(ode_func, x0, y0, h, xmax):
+    x_values = np.arange(x0, xmax + h, h)
+    y_values = [y0]
+    y = y0
+    for x in x_values[:-1]:
+        f1 = ode_func(x, y)
+        f2 = ode_func(x + h, y + h * f1)
+        y += h * (f1 + f2) / 2
+        y_values.append(y)
+    return x_values, np.array(y_values)
+
 def main():
     pass
 

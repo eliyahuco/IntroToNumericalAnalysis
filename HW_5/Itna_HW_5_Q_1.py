@@ -89,16 +89,13 @@ def main():
     plt.plot(x_analytical, y_analytical, label="Analytical Solution", linestyle='dotted')
 
     # Customize plot
-    plt.xlabel('Position x (meters)', fontsize=12, fontweight='bold')
-    plt.ylabel('Dependent Variable M(x)', fontsize=12, fontweight='bold')
+    plt.xlabel('Position x [meters]', fontsize=12, fontweight='bold')
+    plt.ylabel('Moment M(x) [N*m]', fontsize=12, fontweight='bold')
     plt.title('Comparison of Numerical Methods and Analytical Solution', fontsize=14, fontweight='bold')
     plt.legend(fontsize=10, loc='upper right')
     plt.grid(True)
     plt.savefig('comparison_of_numerical_methods_and_analytical_solution_Q1.png')
     plt.show()
-
-
-
 
 
     print("\n")

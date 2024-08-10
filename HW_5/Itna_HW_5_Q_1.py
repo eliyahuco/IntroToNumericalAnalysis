@@ -58,6 +58,8 @@ def rk2_method(ode_func, x0, y0, h, xmax):
 def main():
     def analytical_solution(x):
         return 10 * x - x ** 2
+    print('analytical solution for the ODE:')
+    print('m(x) = 10*x - x^2')
 
     def ode_func(x, m):
         return 10 - 2*x

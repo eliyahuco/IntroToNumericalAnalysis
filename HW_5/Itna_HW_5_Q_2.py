@@ -1,5 +1,5 @@
 """
-Author: Eliyahu cohen
+Author: Eliyahu Cohen
 Email: cohen11@mail.tau.ac.il
 ---------------------------------------------------------------------------------
 Short Description:
@@ -8,7 +8,7 @@ This script is the Question 2 in HW_5 for the course intro to numerical analysis
 
 the objective of this script is to solve the following ODE:
 
-m * d^2y/dt^2 +ky = 0
+m * d^2y/dt^2 + ky = 0
 
     where m is the mass, k is the spring constant and y is the displacement
     m = 2 kg
@@ -24,7 +24,7 @@ m * d^2y/dt^2 +ky = 0
 we will solve the ODE using the following methods:
 1) Euler's method with step size of: 0.05 seconds, 0.1 seconds
 2) Runge-Kutta fourth order method (RK4) with step size of: 0.1 seconds
-3) leapfrog method with step size of: 0.1 seconds
+3) Leapfrog method with step size of: 0.1 seconds
 
 analytical solution:
 y(t) = y(0) * cos(ω*t) + v0/ω * sin(ω*t)
@@ -33,9 +33,9 @@ v(t) = -y(0) * ω * sin(ω*t) + v0 * cos(ω*t)
     where ω = sqrt(k/m)
 
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
-
 
 # Euler method for second-order ODE
 def euler_method_2nd_order(t0, y0, v0, h, tmax, m, k):
@@ -47,20 +47,34 @@ def euler_method_2nd_order(t0, y0, v0, h, tmax, m, k):
     v = v0
 
     for t in t_values[:-1]:
-        y_new = y + h * v
         v_new = v + h * (-k / m * y)
-
-        y_values.append(y_new)
-        v_values.append(v_new)
-
+        y_new = y + h * v
         y = y_new
         v = v_new
 
+        y_values.append(y)
+        v_values.append(v)
+
     return t_values, np.array(y_values), np.array(v_values)
 
+# RK4 method for first-order ODE
+def rk4_method_1st_order(ode_func, x0, y0, h, xmax):
+    x_values = np.arange(x0, xmax + h, h)
+    y_values = [y0]
+    y = y0
+
+    for x in x_values[:-1]:
+        k1 = h * ode_func(x, y)
+        k2 = h * ode_func(x + h / 2, y + k1 / 2)
+        k3 = h * ode_func(x + h / 2, y + k2 / 2)
+        k4 = h * ode_func(x + h, y + k3)
+        y += (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        y_values.append(y)
+
+    return x_values, np.array(y_values)
 
 # RK4 method for second-order ODE
-def rk4_method(t0, y0, v0, h, tmax, m, k):
+def rk4_method_2nd_order(t0, y0, v0, h, tmax, m, k):
     t_values = np.arange(t0, tmax + h, h)
     y_values = [y0]
     v_values = [v0]
@@ -88,6 +102,8 @@ def rk4_method(t0, y0, v0, h, tmax, m, k):
         v_values.append(v)
 
     return t_values, np.array(y_values), np.array(v_values)
+
+
 
 
 # Leapfrog method for second-order ODE
@@ -130,48 +146,64 @@ def main():
     def analytical_solution_v(t):
         return -y0 * omega * np.sin(omega * t) + v0 * np.cos(omega * t)
 
-    # Plot results for displacement
-    plt.figure(figsize=(10, 6))
+    print('\nAnalytical solution of the ODE:')
+    print('Analytical solution of the displacement:')
+    print("y(t) = y(0) * cos(ω*t) + v0/ω * sin(ω*t)")
+    print(f"y(t) = {y0} * cos({omega}*t) + {v0}/{omega} * sin({omega}*t)\n")
+    print('Analytical solution of the velocity:')
+    print("v(t) = -y(0) * ω * sin(ω*t) + v0 * cos(ω*t)")
+    print(f"v(t) = -{y0} * {omega} * sin({omega}*t) + {v0} * cos({omega}*t)\n")
+
+    # Create subplots
+    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+
+    # Plot displacement
     for h in h_values:
         t_euler, y_euler, v_euler = euler_method_2nd_order(t0, y0, v0, h, tmax, m, k)
-        plt.plot(t_euler, y_euler, label=f"Euler's Method h={h}")
+        axs[0].plot(t_euler, y_euler, label=f"Euler's Method h={h}")
 
-    t_rk4, y_rk4, v_rk4 = rk4_method(t0, y0, v0, h_rk4, tmax, m, k)
-    plt.plot(t_rk4, y_rk4, label=f"RK4 Method h={h_rk4}")
+    t_rk4, y_rk4, v_rk4 = rk4_method_2nd_order(t0, y0, v0, h_rk4, tmax, m, k)
+    axs[0].plot(t_rk4, y_rk4, label=f"RK4 Method h={h_rk4}")
 
     t_leapfrog, y_leapfrog, v_leapfrog = leapfrog_method(t0, y0, v0, h_leapfrog, tmax, m, k)
-    plt.plot(t_leapfrog, y_leapfrog, label=f"Leapfrog Method h={h_leapfrog}")
+    axs[0].plot(t_leapfrog, y_leapfrog, label=f"Leapfrog Method h={h_leapfrog}")
 
     t_analytical = np.linspace(t0, tmax, 1000)
     y_analytical = analytical_solution(t_analytical)
-    plt.plot(t_analytical, y_analytical, label="Analytical Solution")
+    axs[0].plot(t_analytical, y_analytical, label="Analytical Solution")
 
-    plt.xlabel("Time (s)")
-    plt.ylabel("Displacement (m)")
-    plt.title("Displacement vs. Time")
-    plt.legend()
-    plt.grid()
-    plt.show()
+    axs[0].set_xlabel("Time (s)", fontweight='bold', fontsize=10)
+    axs[0].set_ylabel("Displacement (m)", fontweight='bold', fontsize=10)
+    axs[0].set_title("Displacement vs. Time", fontsize=14, fontweight='bold')
+    axs[0].legend()
+    axs[0].grid()
 
-    # Plot results for velocity
-    plt.figure(figsize=(10, 6))
+    # Plot velocity
     for h in h_values:
         t_euler, y_euler, v_euler = euler_method_2nd_order(t0, y0, v0, h, tmax, m, k)
-        plt.plot(t_euler, v_euler, label=f"Euler's Method h={h}")
+        axs[1].plot(t_euler, v_euler, label=f"Euler's Method h={h}")
 
-    plt.plot(t_rk4, v_rk4, label=f"RK4 Method h={h_rk4}")
-    plt.plot(t_leapfrog, v_leapfrog, label=f"Leapfrog Method h={h_leapfrog}")
+    axs[1].plot(t_rk4, v_rk4, label=f"RK4 Method h={h_rk4}")
+    axs[1].plot(t_leapfrog, v_leapfrog, label=f"Leapfrog Method h={h_leapfrog}")
 
     v_analytical = analytical_solution_v(t_analytical)
-    plt.plot(t_analytical, v_analytical, label="Analytical Solution")
+    axs[1].plot(t_analytical, v_analytical, label="Analytical Solution")
 
-    plt.xlabel("Time (s)")
-    plt.ylabel("Velocity (m/s)")
-    plt.title("Velocity vs. Time")
-    plt.legend()
-    plt.grid()
+    axs[1].set_xlabel("Time (s)", fontweight='bold', fontsize=10)
+    axs[1].set_ylabel("Velocity (m/s)", fontweight='bold', fontsize=10)
+    axs[1].set_title("Velocity vs. Time", fontsize=14, fontweight='bold')
+    axs[1].legend()
+    axs[1].grid()
+
+    plt.tight_layout()
     plt.show()
 
+    # Save the plot
+    fig.savefig('plot_of_displacement_and_velocity_vs_time.png')
+
+    print("\n")
+    # solve the ODE using rk4_method_1st_order twice
+    print('RK4 method for the first order ODE:')
 
 if __name__ == '__main__':
     main()

@@ -57,20 +57,6 @@ def euler_method_2nd_order(t0, y0, v0, h, tmax, m, k):
 
     return t_values, np.array(y_values), np.array(v_values)
 
-# RK4 method for first-order ODE
-def rk4_method_1st_order(ode_func, x0, y0, h, xmax):
-    x_values = np.arange(x0, xmax + h, h)
-    y_values = [y0]
-    y = y0
-
-    for x in x_values[:-1]:
-        f1 = ode_func(x, y)
-        f2 = ode_func(x + h / 2, y + h / 2 * f1)
-        f3 = ode_func(x + h / 2, y + h / 2 * f2)
-        f4 = ode_func(x + h, y + h * f3)
-        y += h * (f1 + 2 * f2 + 2 * f3 + f4) / 6
-        y_values.append(y)
-
 # RK4 method for second-order ODE
 def rk4_method_2nd_order(t0, y0, v0, h, tmax, m, k):
     t_values = np.arange(t0, tmax + h, h)
@@ -194,10 +180,11 @@ def main():
     axs[1].grid()
 
     plt.tight_layout()
+    fig.savefig('plot_of_displacement_and_velocity_vs_time_Q_2.png')
     plt.show()
 
     # Save the plot
-    fig.savefig('plot_of_displacement_and_velocity_vs_time_Q_2.png')
+
 
     print("\n")
     print("the script has finished running")

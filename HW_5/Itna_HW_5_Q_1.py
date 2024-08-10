@@ -94,10 +94,11 @@ def main():
     plt.title('Comparison of Numerical Methods and Analytical Solution', fontsize=14, fontweight='bold')
     plt.legend(fontsize=10, loc='upper right')
     plt.grid(True)
+    plt.savefig('comparison_of_numerical_methods_and_analytical_solution_Q1.png')
     plt.show()
 
-    # save the plot
-    plt.savefig('comparison_of_numerical_methods_and_analytical_solution_Q1.png')
+
+
 
 
     print("\n")

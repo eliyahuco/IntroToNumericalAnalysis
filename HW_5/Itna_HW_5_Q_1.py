@@ -78,7 +78,7 @@ def main():
     h_values = [0.05, 0.25]
 
     # Create subplots
-    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axs = plt.subplots(1, 2, figsize=(16, 6))
 
     # Plot for ODE comparison
     for h in h_values:
@@ -90,7 +90,7 @@ def main():
 
     x_analytical = np.linspace(x0, xmax, 1000)
     y_analytical = analytical_solution(x_analytical)
-    axs[0].plot(x_analytical, y_analytical, label="Analytical Solution", linestyle='dotted')
+    axs[0].plot(x_analytical, y_analytical, label="Analytical Solution", linestyle=':', color='black')
 
     axs[0].set_xlabel('Position x [meters]', fontsize=12, fontweight='bold')
     axs[0].set_ylabel('Moment M(x) [N*m]', fontsize=12, fontweight='bold')
@@ -111,7 +111,7 @@ def main():
 
     # Save and show plot
     plt.tight_layout()
-    plt.savefig('comparison_and_shear_stress.png')
+    plt.savefig('comparison_of_numerical_methods_and_analytical_solution_Q1.png')
     plt.show()
 
     print("\n")

@@ -64,14 +64,12 @@ def rk4_method_1st_order(ode_func, x0, y0, h, xmax):
     y = y0
 
     for x in x_values[:-1]:
-        k1 = h * ode_func(x, y)
-        k2 = h * ode_func(x + h / 2, y + k1 / 2)
-        k3 = h * ode_func(x + h / 2, y + k2 / 2)
-        k4 = h * ode_func(x + h, y + k3)
-        y += (k1 + 2 * k2 + 2 * k3 + k4) / 6
+        f1 = ode_func(x, y)
+        f2 = ode_func(x + h / 2, y + h / 2 * f1)
+        f3 = ode_func(x + h / 2, y + h / 2 * f2)
+        f4 = ode_func(x + h, y + h * f3)
+        y += h * (f1 + 2 * f2 + 2 * f3 + f4) / 6
         y_values.append(y)
-
-    return x_values, np.array(y_values)
 
 # RK4 method for second-order ODE
 def rk4_method_2nd_order(t0, y0, v0, h, tmax, m, k):

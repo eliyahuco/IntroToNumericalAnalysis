@@ -115,7 +115,7 @@ def main():
              bbox=dict(facecolor='white', alpha=0.5))
     plt.legend()
     plt.grid()
-    plt.savefig('ODE_Adams_Bashforth_Moulton_Predictor_Corrector_and_Analytical_Solution_Plot_Q_3.png')
+    plt.savefig('Adams_Bashforth_Moulton_Predictor_Corrector_and_Analytical_Solution_Plot_Q_3.png')
     plt.show()
 
     print("\nThe script has finished running.")

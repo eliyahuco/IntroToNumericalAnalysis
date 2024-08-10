@@ -78,7 +78,7 @@ def main():
     h_values = [0.05, 0.25]
 
     # Create subplots
-    fig, axs = plt.subplots(1, 2, figsize=(16, 6))
+    fig, axs = plt.subplots(1, 2, figsize=(16,6))
 
     # Plot for ODE comparison
     for h in h_values:
@@ -86,11 +86,11 @@ def main():
         axs[0].plot(x_euler, y_euler, label=f"Euler's Method h={h}")
 
     x_rk2, y_rk2 = rk2_method(ode_func, x0, mo, 0.05, xmax)
-    axs[0].plot(x_rk2, y_rk2, label="RK2 Method h=0.05", linestyle='--')
+    axs[0].plot(x_rk2, y_rk2, label="RK2 Method h=0.05", linestyle='-.', color='lime')
 
     x_analytical = np.linspace(x0, xmax, 1000)
     y_analytical = analytical_solution(x_analytical)
-    axs[0].plot(x_analytical, y_analytical, label="Analytical Solution", linestyle=':', color='black')
+    axs[0].plot(x_analytical, y_analytical, label="Analytical Solution", linestyle='--', color='lightcoral')
 
     axs[0].set_xlabel('Position x [meters]', fontsize=12, fontweight='bold')
     axs[0].set_ylabel('Moment M(x) [N*m]', fontsize=12, fontweight='bold')

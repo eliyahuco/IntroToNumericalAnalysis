@@ -32,6 +32,10 @@ v(t) = -y(0) * ω * sin(ω*t) + v0 * cos(ω*t)
 
     where ω = sqrt(k/m)
 
+we will compare the results of the methods and with the analytical solution
+also we will plot the results
+
+---------------------------------------------------------------------------------
 """
 
 import numpy as np
@@ -88,8 +92,6 @@ def rk4_method_2nd_order(t0, y0, v0, h, tmax, m, k):
     return t_values, np.array(y_values), np.array(v_values)
 
 
-
-
 # Leapfrog method for second-order ODE
 def leapfrog_method(t0, y0, v0, h, tmax, m, k):
     t_values = np.arange(t0, tmax + h, h)
@@ -108,7 +110,6 @@ def leapfrog_method(t0, y0, v0, h, tmax, m, k):
         v_values.append(v)
 
     return t_values, np.array(y_values), np.array(v_values)
-
 
 def main():
     m = 2
@@ -182,8 +183,6 @@ def main():
     plt.tight_layout()
     fig.savefig('plot_of_displacement_and_velocity_vs_time_Q_2.png')
     plt.show()
-
-    # Save the plot
 
 
     print("\n")

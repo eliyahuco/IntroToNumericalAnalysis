@@ -1,3 +1,30 @@
+"""
+Author: Eliyahu Cohen
+Email: cohen11@mail.tau.ac.il
+---------------------------------------------------------------------------------
+Short Description:
+
+This script is the Question 3 in HW_5 for the course intro to numerical analysis
+
+The objective of this script is to solve the following ODE:
+
+dy/dx = (-2y)/(1+x)
+
+We will solve the ODE using the fourth-order Adams-Bashforth as a predictor and the fourth-order Adams-Moulton as a corrector simultaneously.
+For the first 3 steps, we will use the Runge-Kutta fourth-order method (RK4) to predict the next steps with h = 0.5.
+
+Initial conditions:
+y(x=0) = 2
+
+Analytical solution:
+y(x) = 2 / (1 + x)^2
+
+We will compare the results of the methods and with the analytical solution.
+Also, we will plot the results.
+
+---------------------------------------------------------------------------------
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,20 +51,20 @@ def rk4_method_1st_order(ode_func, x0, y0, h, steps):
 # Adams-Bashforth Fourth Order Predictor
 def adams_bashforth_4th_order_predictor(ode_func, x_values, y_values, h):
     return y_values[-1] + h / 24 * (
-        55 * ode_func(x_values[-1], y_values[-1])
-        - 59 * ode_func(x_values[-2], y_values[-2])
-        + 37 * ode_func(x_values[-3], y_values[-3])
-        - 9 * ode_func(x_values[-4], y_values[-4])
+            55 * ode_func(x_values[-1], y_values[-1])
+            - 59 * ode_func(x_values[-2], y_values[-2])
+            + 37 * ode_func(x_values[-3], y_values[-3])
+            - 9 * ode_func(x_values[-4], y_values[-4])
     )
 
 
 # Adams-Moulton Fourth Order Corrector
 def adams_moulton_4th_order_corrector(ode_func, x_values, y_values, y_pred, h):
     return y_values[-1] + h / 24 * (
-        9 * ode_func(x_values[-1] + h, y_pred)
-        + 19 * ode_func(x_values[-1], y_values[-1])
-        - 5 * ode_func(x_values[-2], y_values[-2])
-        + ode_func(x_values[-3], y_values[-3])
+            9 * ode_func(x_values[-1] + h, y_pred)
+            + 19 * ode_func(x_values[-1], y_values[-1])
+            - 5 * ode_func(x_values[-2], y_values[-2])
+            + ode_func(x_values[-3], y_values[-3])
     )
 
 
@@ -77,13 +104,15 @@ def main():
     y_analytical = analytical_solution(x_analytical)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(x_values, y_values, label='Adams-Bashforth 4th Order Predictor & Adams-Moulton 4th Order Corrector', marker='o')
+    plt.plot(x_values, y_values, label='Adams-Bashforth 4th Order Predictor & Adams-Moulton 4th Order Corrector',
+             marker='o')
     plt.plot(x_analytical, y_analytical, 'r--', label='Analytical Solution')
     plt.xlabel('x', fontweight='bold', fontsize=14)
     plt.ylabel('y', fontweight='bold', fontsize=14)
     plt.title(r'Solution of $\frac{dy}{dx} = \frac{-2y}{1+x}$', fontsize=14, fontweight='bold')
     plt.text(4.5, 1.5, r'$y(0) = 2$', fontsize=12, bbox=dict(facecolor='white', alpha=0.5))
-    plt.text(4.5, 1.7, "Analytical solution: " + r'$y(x) = \frac{2}{(1+x)^2}$', fontsize=12, bbox=dict(facecolor='white', alpha=0.5))
+    plt.text(4.5, 1.7, "Analytical solution: " + r'$y(x) = \frac{2}{(1+x)^2}$', fontsize=12,
+             bbox=dict(facecolor='white', alpha=0.5))
     plt.legend()
     plt.grid()
     plt.savefig('ODE_Adams_Bashforth_Moulton_Predictor_Corrector_and_Analytical_Solution_Plot_Q_3.png')

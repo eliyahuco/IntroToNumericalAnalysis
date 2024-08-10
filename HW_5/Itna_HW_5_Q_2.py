@@ -202,8 +202,7 @@ def main():
     fig.savefig('plot_of_displacement_and_velocity_vs_time.png')
 
     print("\n")
-    # solve the ODE using rk4_method_1st_order twice
-    print('RK4 method for the first order ODE:')
+    print("the script has finished running")
 
 if __name__ == '__main__':
     main()

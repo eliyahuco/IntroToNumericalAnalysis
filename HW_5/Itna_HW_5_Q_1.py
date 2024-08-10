@@ -96,6 +96,9 @@ def main():
     plt.grid(True)
     plt.show()
 
+    # save the plot
+    plt.savefig('comparison_of_numerical_methods_and_analytical_solution_Q1.png')
+
 
     print("\n")
     print("the script has finished running")

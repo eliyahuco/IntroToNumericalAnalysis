@@ -197,7 +197,7 @@ def main():
     plt.show()
 
     # Save the plot
-    fig.savefig('plot_of_displacement_and_velocity_vs_time.png')
+    fig.savefig('plot_of_displacement_and_velocity_vs_time_Q_2.png')
 
     print("\n")
     print("the script has finished running")

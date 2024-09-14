@@ -16,9 +16,10 @@ the objective of this script is to solve a problem of the wave equation in 2D sp
         x,z are the spatial coordinates
         t is the time coordinate
 
-        the source function is given as:
-        F(t) = t*exp(2*pi*t)*sin(2*pi*t) for  0<=t<=0.05
-        F(t) = 0 for t>0.05
+            the source function is given as:
+            F(t) = t*exp(2*pi*t)*sin(2*pi*t) for  0<=t<=0.05
+            F(t) = 0 for t>0.05
+            the source location is at x=3000 meters, z=2800 meters
 
 
 

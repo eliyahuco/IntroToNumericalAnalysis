@@ -424,6 +424,56 @@ def get_interpolation_error(x, f_x, interpolation_function):
     rel_error_percentage = abs((f_x - interpolation_function) / f_x) * 100
     return abs_error, rel_error, rel_error_percentage
 
+def natural_cubic_spline(x_i, y_i):
+    n = len(x_i)
+    h = np.diff(x_i)
+
+    a = np.zeros(n)
+    b = np.zeros(n - 1)
+    c = np.zeros(n)
+    d = np.zeros(n - 1)
+    alpha = np.zeros(n)
+
+    for i in range(1, n - 1):
+        a[i] = 2 * (h[i - 1] + h[i])
+        b[i - 1] = h[i]
+        c[i] = h[i - 1]
+        alpha[i] = 3 * ((y_i[i + 1] - y_i[i]) / h[i] - (y_i[i] - y_i[i - 1]) / h[i - 1])
+
+    A = a[1:n - 1]
+    B = b[:n - 2]
+    C = c[2:n]
+    D = alpha[1:n - 1]
+
+    c_sol = tridiagonal_matrix_algorithm(C, A, B, D)
+
+    c = np.zeros(n)
+    c[1:n - 1] = c_sol
+
+    b = np.zeros(n - 1)
+    d = np.zeros(n - 1)
+    a = y_i[:-1]
+
+    for i in range(n - 1):
+        b[i] = (y_i[i + 1] - y_i[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3
+        d[i] = (c[i + 1] - c[i]) / (3 * h[i])
+
+    spline_coeffs = np.array([a, b, c[:-1], d]).T
+    return spline_coeffs
+
+def evaluate_spline(x, spline_coeffs, xi):
+    i = np.searchsorted(x, xi) - 1
+    i = np.clip(i, 0, len(spline_coeffs) - 1)
+
+    dx = xi - x[i]
+    a, b, c, d = spline_coeffs[i]
+
+    fi = a + b * dx + c * dx ** 2 + d * dx ** 3
+    f_prime = b + 2 * c * dx + 3 * d * dx ** 2
+    f_double_prime = 2 * c + 6 * d * dx
+
+    return fi, f_prime, f_double_prime
+
 def change_function_limits_to_0_1(f, a, b):
     """
     This function changes the limits of the integral to (0,1)

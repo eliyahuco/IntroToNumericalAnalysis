@@ -127,30 +127,58 @@ def evaluate_spline(x, spline_coeffs, xi):
 
     return fi, f_prime, f_double_prime
 
-# Get the spline coefficients
-spline_coefficients = natural_cubic_spline(x_values, z_values)
-x_segment = np.linspace(0, 6000, 1000)
+def source_function(t):
+    if t <= 0.05:
+        return t * np.exp(2 * np.pi * t) * np.sin(2 * np.pi * t)
+    else:
+        return 0
 
-# Evaluate the spline for each segment
-layer_values = np.array([evaluate_spline(x_values, spline_coefficients, x) for x in x_segment])
+def wave_speed_function(x, z, spline_coefficients):
+    spline_coefficients = natural_cubic_spline(x_values, z_values)
+    layer, _, _ = evaluate_spline(x_values, spline_coeffs, x)
 
-# Create the plot
-plt.plot(x_segment, layer_values[:, 0], label='Layer')
-plt.scatter(x_values, z_values, color='red', label='Layer Points')
-plt.scatter(3000, 2800, color='green', label='Source Location')
+    # Define the wave speed
+    if z <= layer:
+        c = 2000
+    else:
+        c = 3000
 
-# Set limits for x and z to create a square plot
-plt.xlim(0, 6000)
-plt.ylim(6000, 0)  # Invert the z-axis
+    return c
 
-# Set aspect ratio to be equal (square plot)
-plt.gca().set_aspect('equal', adjustable='box')
 
-# Add labels, title, and legend
-plt.xlabel('x [m]')
-plt.ylabel('z [m]')
-plt.title('Layer of the Wave Speed')
-plt.legend()
 
-# Show the plot
-plt.show()
+
+def main()
+    # Get the spline coefficients
+    spline_coefficients = natural_cubic_spline(x_values, z_values)
+    x_segment = np.linspace(0, 6000, 1000)
+
+    # Evaluate the spline for each segment
+    layer_values = np.array([evaluate_spline(x_values, spline_coefficients, x) for x in x_segment])
+
+    # Create the plot
+    plt.plot(x_segment, layer_values[:, 0], label='Layer')
+    plt.scatter(x_values, z_values, color='red', label='Layer Points')
+    plt.scatter(3000, 2800, color='green', label='Source Location')
+
+    # Set limits for x and z to create a square plot
+    plt.xlim(0, 6000)
+    plt.ylim(6000, 0)  # Invert the z-axis
+
+    # Set aspect ratio to be equal (square plot)
+    plt.gca().set_aspect('equal', adjustable='box')
+
+    # Add labels, title, and legend
+    plt.xlabel('x [m]')
+    plt.ylabel('z [m]')
+    plt.title('Layer of the Wave Speed')
+    plt.legend()
+
+    # Show the plot
+    plt.show()
+
+
+
+
+if __name__ == '__main__':
+    main()

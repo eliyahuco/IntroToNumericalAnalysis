@@ -40,11 +40,12 @@ we will solve the wave equation in the explicit method
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import numerical_analysis_methods_tools as na_tools
 
+# Define the points
 x_values = np.array([0, 1000, 2600, 4600, 6000])
-z_values = np.array([-2600, -4000, -3200, -3600, -2400])
+z_values = np.array([2600, 4000, 3200, 3600, 2400])
+
+# Tridiagonal matrix algorithm and natural cubic spline functions (same as provided)
 def tridiagonal_matrix_algorithm(a, b, c, d):
     n = len(d)
     c_ = np.zeros(n - 1)
@@ -75,6 +76,7 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
         x[i] = d_[i] - c_[i] * x[i + 1]
 
     return x
+
 def natural_cubic_spline(x_i, y_i):
     n = len(x_i)
     h = np.diff(x_i)
@@ -125,16 +127,30 @@ def evaluate_spline(x, spline_coeffs, xi):
 
     return fi, f_prime, f_double_prime
 
-#plot the spline interpolation and add scatter ot the piont and the source location
+# Get the spline coefficients
 spline_coefficients = natural_cubic_spline(x_values, z_values)
 x_segment = np.linspace(0, 6000, 1000)
 
+# Evaluate the spline for each segment
 layer_values = np.array([evaluate_spline(x_values, spline_coefficients, x) for x in x_segment])
+
+# Create the plot
 plt.plot(x_segment, layer_values[:, 0], label='Layer')
 plt.scatter(x_values, z_values, color='red', label='Layer Points')
-plt.scatter(3000, -2800, color='green', label='Source Location')
+plt.scatter(3000, 2800, color='green', label='Source Location')
+
+# Set limits for x and z to create a square plot
+plt.xlim(0, 6000)
+plt.ylim(6000, 0)  # Invert the z-axis
+
+# Set aspect ratio to be equal (square plot)
+plt.gca().set_aspect('equal', adjustable='box')
+
+# Add labels, title, and legend
 plt.xlabel('x [m]')
 plt.ylabel('z [m]')
-plt.title('Layer of the wave speed')
+plt.title('Layer of the Wave Speed')
 plt.legend()
+
+# Show the plot
 plt.show()

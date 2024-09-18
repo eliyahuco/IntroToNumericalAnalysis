@@ -40,36 +40,27 @@ we will solve the wave equation in the explicit method
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
-# Define the points
+# Define the points for cubic spline interpolation
 x_values = np.array([0, 1000, 2600, 4600, 6000])
 z_values = np.array([2600, 4000, 3200, 3600, 2400])
 
-# Tridiagonal matrix algorithm and natural cubic spline functions (same as provided)
+
+# Tridiagonal matrix algorithm for solving the system in cubic spline interpolation
 def tridiagonal_matrix_algorithm(a, b, c, d):
     n = len(d)
     c_ = np.zeros(n - 1)
     d_ = np.zeros(n)
     x = np.zeros(n)
 
-    if b[0] != 0:
-        c_[0] = c[0] / b[0]
-        d_[0] = d[0] / b[0]
-    else:
-        c_[0] = 0
-        d_[0] = 0
+    c_[0] = c[0] / b[0]
+    d_[0] = d[0] / b[0]
 
     for i in range(1, n - 1):
-        if (b[i] - a[i - 1] * c_[i - 1]) != 0:
-            c_[i] = c[i] / (b[i] - a[i - 1] * c_[i - 1])
-        else:
-            c_[i] = 0
-
+        c_[i] = c[i] / (b[i] - a[i - 1] * c_[i - 1])
     for i in range(1, n):
-        if (b[i] - a[i - 1] * c_[i - 1]) != 0:
-            d_[i] = (d[i] - a[i - 1] * d_[i - 1]) / (b[i] - a[i - 1] * c_[i - 1])
-        else:
-            d_[i] = 0
+        d_[i] = (d[i] - a[i - 1] * d_[i - 1]) / (b[i] - a[i - 1] * c_[i - 1])
 
     x[-1] = d_[-1]
     for i in range(n - 2, -1, -1):
@@ -77,10 +68,11 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
 
     return x
 
+
+# Natural cubic spline function
 def natural_cubic_spline(x_i, y_i):
     n = len(x_i)
     h = np.diff(x_i)
-
     a = np.zeros(n)
     b = np.zeros(n - 1)
     c = np.zeros(n)
@@ -97,7 +89,6 @@ def natural_cubic_spline(x_i, y_i):
     B = b[:n - 2]
     C = c[2:n]
     D = alpha[1:n - 1]
-
     c_sol = tridiagonal_matrix_algorithm(C, A, B, D)
 
     c = np.zeros(n)
@@ -111,73 +102,114 @@ def natural_cubic_spline(x_i, y_i):
         b[i] = (y_i[i + 1] - y_i[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3
         d[i] = (c[i + 1] - c[i]) / (3 * h[i])
 
-    spline_coeffs = np.array([a, b, c[:-1], d]).T
-    return spline_coeffs
+    return np.array([a, b, c[:-1], d]).T
 
+
+# Evaluate spline at a point xi
 def evaluate_spline(x, spline_coeffs, xi):
     i = np.searchsorted(x, xi) - 1
     i = np.clip(i, 0, len(spline_coeffs) - 1)
-
     dx = xi - x[i]
     a, b, c, d = spline_coeffs[i]
+    return a + b * dx + c * dx ** 2 + d * dx ** 3
 
-    fi = a + b * dx + c * dx ** 2 + d * dx ** 3
-    f_prime = b + 2 * c * dx + 3 * d * dx ** 2
-    f_double_prime = 2 * c + 6 * d * dx
 
-    return fi, f_prime, f_double_prime
-
+# Define the source function
 def source_function(t):
     if t <= 0.05:
         return t * np.exp(2 * np.pi * t) * np.sin(2 * np.pi * t)
     else:
         return 0
 
+
+# Get wave speed based on location and spline interpolation
 def wave_speed_function(x, z, spline_coefficients):
-    spline_coefficients = natural_cubic_spline(x_values, z_values)
-    layer, _, _ = evaluate_spline(x_values, spline_coeffs, x)
-
-    # Define the wave speed
-    if z <= layer:
-        c = 2000
-    else:
-        c = 3000
-
-    return c
+    layer = evaluate_spline(x_values, spline_coefficients, x)
+    return 2000 if z <= layer else 3000
 
 
+# Define 4th-order finite difference laplacian
+def laplacian_4th_order(u, dx):
+    laplacian_u = np.zeros_like(u)
+    for i in range(2, u.shape[0] - 2):
+        for j in range(2, u.shape[1] - 2):
+            laplacian_u[i, j] = (
+                                        - (1 / 12) * (u[i - 2, j] + u[i + 2, j] + u[i, j - 2] + u[i, j + 2])
+                                        + (4 / 3) * (u[i - 1, j] + u[i + 1, j] + u[i, j - 1] + u[i, j + 1])
+                                        - (5 / 2) * u[i, j]
+                                ) / dx ** 2
+    return laplacian_u
 
 
-def main()
-    # Get the spline coefficients
-    spline_coefficients = natural_cubic_spline(x_values, z_values)
-    x_segment = np.linspace(0, 6000, 1000)
+# Main wave propagation loop
+def update_wave(u, dx, dz, dt, t_max, x_grid, z_grid, spline_coefficients, x_max, z_max):
+    nt = int(t_max / dt) + 1
+    for n in range(1, nt):
+        lap_u = laplacian_4th_order(u[:, :, 1], dx) + laplacian_4th_order(u[:, :, 1], dz)
 
-    # Evaluate the spline for each segment
-    layer_values = np.array([evaluate_spline(x_values, spline_coefficients, x) for x in x_segment])
+        for i in range(2, u.shape[0] - 2):
+            for j in range(2, u.shape[1] - 2):
+                c = wave_speed_function(x_grid[i], z_grid[j], spline_coefficients)
+                u[i, j, 2] = (2 * u[i, j, 1] - u[i, j, 0]
+                              + dt ** 2 * c ** 2 * lap_u[i, j]
+                              + dt ** 2 * source_function(n * dt) if i == 30 and j == 28 else 0)
 
-    # Create the plot
-    plt.plot(x_segment, layer_values[:, 0], label='Layer')
-    plt.scatter(x_values, z_values, color='red', label='Layer Points')
-    plt.scatter(3000, 2800, color='green', label='Source Location')
+        # Apply boundary conditions (simple reflecting)
+        u[:, 0, 2] = u[:, 1, 2]
+        u[:, -1, 2] = u[:, -2, 2]
+        u[0, :, 2] = u[1, :, 2]
+        u[-1, :, 2] = u[-2, :, 2]
 
-    # Set limits for x and z to create a square plot
-    plt.xlim(0, 6000)
-    plt.ylim(6000, 0)  # Invert the z-axis
+        # Shift time steps
+        u[:, :, 0] = u[:, :, 1]
+        u[:, :, 1] = u[:, :, 2]
 
-    # Set aspect ratio to be equal (square plot)
-    plt.gca().set_aspect('equal', adjustable='box')
+        # Save snapshots at specific times
+        if np.isclose(n * dt, 0.15, atol=dt) or np.isclose(n * dt, 0.4, atol=dt):
+            plt.imshow(u[:, :, 1], cmap='seismic', extent=[0, x_max, 0, z_max])
+            plt.colorbar(label='Wave Amplitude')
+            plt.title(f"Wave Field at t = {n * dt:.2f} seconds")
+            plt.show()
 
-    # Add labels, title, and legend
-    plt.xlabel('x [m]')
-    plt.ylabel('z [m]')
-    plt.title('Layer of the Wave Speed')
-    plt.legend()
 
-    # Show the plot
+# Function to animate the wave
+def animate_wave(u, dt, x_max, z_max, nt):
+    fig, ax = plt.subplots()
+    cax = ax.imshow(u[:, :, 1], cmap='seismic', extent=[0, x_max, 0, z_max], animated=True)
+    fig.colorbar(cax, label='Wave Amplitude')
+
+    def update(frame):
+        # Ensure correct shape for the frame data
+        cax.set_array(u[:, :, 1].flatten())
+        return cax,
+
+    ani = animation.FuncAnimation(fig, update, frames=range(nt), blit=True)
     plt.show()
 
 
+# Main function
+def main():
+    # Grid setup
+    dx = dz = 100  # meters
+    dt1 = 0.01  # seconds
+    x_max, z_max = 6000, 6000
+    t_max1 = 1.0
+    x_grid = np.arange(0, x_max + dx, dx)
+    z_grid = np.arange(0, z_max + dz, dz)
+    nx, nz = len(x_grid), len(z_grid)
+    nt1 = int(t_max1 / dt1) + 1
+
+    # Initialize wave field u(x, z, t)
+    u = np.zeros((nx, nz, 3))  # 3 time levels: n-1, n, n+1
+
+    # Get spline coefficients for the layer
+    spline_coefficients = natural_cubic_spline(x_values, z_values)
+
+    # Update wave field
+    update_wave(u, dx, dz, dt1, t_max1, x_grid, z_grid, spline_coefficients, x_max, z_max)
+
+    # Animate wave field
+    animate_wave(u, dt1, x_max, z_max, nt1)
 
 
 if __name__ == '__main__':

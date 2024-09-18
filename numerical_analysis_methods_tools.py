@@ -423,7 +423,36 @@ def get_interpolation_error(x, f_x, interpolation_function):
     rel_error = abs((f_x - interpolation_function) / f_x)
     rel_error_percentage = abs((f_x - interpolation_function) / f_x) * 100
     return abs_error, rel_error, rel_error_percentage
+def tridiagonal_matrix_algorithm(a, b, c, d):
+    n = len(d)
+    c_ = np.zeros(n - 1)
+    d_ = np.zeros(n)
+    x = np.zeros(n)
 
+    if b[0] != 0:
+        c_[0] = c[0] / b[0]
+        d_[0] = d[0] / b[0]
+    else:
+        c_[0] = 0
+        d_[0] = 0
+
+    for i in range(1, n - 1):
+        if (b[i] - a[i - 1] * c_[i - 1]) != 0:
+            c_[i] = c[i] / (b[i] - a[i - 1] * c_[i - 1])
+        else:
+            c_[i] = 0
+
+    for i in range(1, n):
+        if (b[i] - a[i - 1] * c_[i - 1]) != 0:
+            d_[i] = (d[i] - a[i - 1] * d_[i - 1]) / (b[i] - a[i - 1] * c_[i - 1])
+        else:
+            d_[i] = 0
+
+    x[-1] = d_[-1]
+    for i in range(n - 2, -1, -1):
+        x[i] = d_[i] - c_[i] * x[i + 1]
+
+    return x
 def natural_cubic_spline(x_i, y_i):
     n = len(x_i)
     h = np.diff(x_i)

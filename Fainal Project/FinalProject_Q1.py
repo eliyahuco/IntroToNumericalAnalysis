@@ -47,4 +47,17 @@ x_values = np.array([0, 1000, 2600, 4600, 6000])
 z_values = np.array([2600, 4000, 3200, 3600, 2400])
 n_splines = len(x_values)
 
-spline_coefficients
+spline_coefficients = na_tools.natural_cubic_spline(x_values, z_values)
+
+x_segment = np.arange(0, 6000, 100)
+z_segment = [na_tools.evaluate_spline(x, x_values, spline_coefficients) for x in x_segment]
+#plot the cubic spline interpolation and the points
+# add to the plot the position of the source
+plt.plot(x_values, z_values, 'ro', label='Layer Points')
+plt.plot(x_segment, z_segment, label='Cubic Spline Interpolation')
+plt.xlabel('x [m]')
+plt.ylabel('z [m]')
+plt.title('Layer of the Wave Speed')
+plt.legend()
+plt.grid()
+plt.show()

@@ -44,20 +44,97 @@ import matplotlib.animation as animation
 import numerical_analysis_methods_tools as na_tools
 
 x_values = np.array([0, 1000, 2600, 4600, 6000])
-z_values = np.array([2600, 4000, 3200, 3600, 2400])
-n_splines = len(x_values)
+z_values = np.array([-2600, -4000, -3200, -3600, -2400])
+def tridiagonal_matrix_algorithm(a, b, c, d):
+    n = len(d)
+    c_ = np.zeros(n - 1)
+    d_ = np.zeros(n)
+    x = np.zeros(n)
 
-spline_coefficients = na_tools.natural_cubic_spline(x_values, z_values)
+    if b[0] != 0:
+        c_[0] = c[0] / b[0]
+        d_[0] = d[0] / b[0]
+    else:
+        c_[0] = 0
+        d_[0] = 0
 
-x_segment = np.arange(0, 6000, 100)
-z_segment = [na_tools.evaluate_spline(x, x_values, spline_coefficients) for x in x_segment]
-#plot the cubic spline interpolation and the points
-# add to the plot the position of the source
-plt.plot(x_values, z_values, 'ro', label='Layer Points')
-plt.plot(x_segment, z_segment, label='Cubic Spline Interpolation')
+    for i in range(1, n - 1):
+        if (b[i] - a[i - 1] * c_[i - 1]) != 0:
+            c_[i] = c[i] / (b[i] - a[i - 1] * c_[i - 1])
+        else:
+            c_[i] = 0
+
+    for i in range(1, n):
+        if (b[i] - a[i - 1] * c_[i - 1]) != 0:
+            d_[i] = (d[i] - a[i - 1] * d_[i - 1]) / (b[i] - a[i - 1] * c_[i - 1])
+        else:
+            d_[i] = 0
+
+    x[-1] = d_[-1]
+    for i in range(n - 2, -1, -1):
+        x[i] = d_[i] - c_[i] * x[i + 1]
+
+    return x
+def natural_cubic_spline(x_i, y_i):
+    n = len(x_i)
+    h = np.diff(x_i)
+
+    a = np.zeros(n)
+    b = np.zeros(n - 1)
+    c = np.zeros(n)
+    d = np.zeros(n - 1)
+    alpha = np.zeros(n)
+
+    for i in range(1, n - 1):
+        a[i] = 2 * (h[i - 1] + h[i])
+        b[i - 1] = h[i]
+        c[i] = h[i - 1]
+        alpha[i] = 3 * ((y_i[i + 1] - y_i[i]) / h[i] - (y_i[i] - y_i[i - 1]) / h[i - 1])
+
+    A = a[1:n - 1]
+    B = b[:n - 2]
+    C = c[2:n]
+    D = alpha[1:n - 1]
+
+    c_sol = tridiagonal_matrix_algorithm(C, A, B, D)
+
+    c = np.zeros(n)
+    c[1:n - 1] = c_sol
+
+    b = np.zeros(n - 1)
+    d = np.zeros(n - 1)
+    a = y_i[:-1]
+
+    for i in range(n - 1):
+        b[i] = (y_i[i + 1] - y_i[i]) / h[i] - h[i] * (c[i + 1] + 2 * c[i]) / 3
+        d[i] = (c[i + 1] - c[i]) / (3 * h[i])
+
+    spline_coeffs = np.array([a, b, c[:-1], d]).T
+    return spline_coeffs
+
+def evaluate_spline(x, spline_coeffs, xi):
+    i = np.searchsorted(x, xi) - 1
+    i = np.clip(i, 0, len(spline_coeffs) - 1)
+
+    dx = xi - x[i]
+    a, b, c, d = spline_coeffs[i]
+
+    fi = a + b * dx + c * dx ** 2 + d * dx ** 3
+    f_prime = b + 2 * c * dx + 3 * d * dx ** 2
+    f_double_prime = 2 * c + 6 * d * dx
+
+    return fi, f_prime, f_double_prime
+
+#plot the spline interpolation and add scatter ot the piont and the source location
+spline_coefficients = natural_cubic_spline(x_values, z_values)
+x_segment = np.linspace(0, 6000, 1000)
+
+layer_values = np.array([evaluate_spline(x_values, spline_coefficients, x) for x in x_segment])
+plt.plot(x_segment, layer_values[:, 0], label='Layer')
+plt.scatter(x_values, z_values, color='red', label='Layer Points')
+plt.scatter(3000, -2800, color='green', label='Source Location')
 plt.xlabel('x [m]')
 plt.ylabel('z [m]')
-plt.title('Layer of the Wave Speed')
+plt.title('Layer of the wave speed')
 plt.legend()
-plt.grid()
 plt.show()

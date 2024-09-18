@@ -33,5 +33,18 @@ for dt = 0.03 seconds at t = 0.15,0.3,0.6,0.9 seconds
 
 at the end we will plot animation of the wave field with dt = 0.01 seconds
 
+we will solve the wave equation in the explicit method
+
 ---------------------------------------------------------------------------------
 """
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import numerical_analysis_methods_tools as na_tools
+
+x_values = np.array([0, 1000, 2600, 4600, 6000])
+z_values = np.array([2600, 4000, 3200, 3600, 2400])
+n_splines = len(x_values)
+
+spline_coefficients

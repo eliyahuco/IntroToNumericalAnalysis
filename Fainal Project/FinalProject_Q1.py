@@ -37,7 +37,6 @@ we will solve the wave equation in the explicit method
 
 ---------------------------------------------------------------------------------
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -45,7 +44,6 @@ import matplotlib.animation as animation
 # Define the points for cubic spline interpolation
 x_values = np.array([0, 1000, 2600, 4600, 6000])
 z_values = np.array([2600, 4000, 3200, 3600, 2400])
-
 
 # Tridiagonal matrix algorithm for solving the system in cubic spline interpolation
 def tridiagonal_matrix_algorithm(a, b, c, d):
@@ -67,7 +65,6 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
         x[i] = d_[i] - c_[i] * x[i + 1]
 
     return x
-
 
 # Natural cubic spline function
 def natural_cubic_spline(x_i, y_i):
@@ -104,7 +101,6 @@ def natural_cubic_spline(x_i, y_i):
 
     return np.array([a, b, c[:-1], d]).T
 
-
 # Evaluate spline at a point xi
 def evaluate_spline(x, spline_coeffs, xi):
     i = np.searchsorted(x, xi) - 1
@@ -113,7 +109,6 @@ def evaluate_spline(x, spline_coeffs, xi):
     a, b, c, d = spline_coeffs[i]
     return a + b * dx + c * dx ** 2 + d * dx ** 3
 
-
 # Define the source function
 def source_function(t):
     if t <= 0.05:
@@ -121,12 +116,10 @@ def source_function(t):
     else:
         return 0
 
-
 # Get wave speed based on location and spline interpolation
 def wave_speed_function(x, z, spline_coefficients):
     layer = evaluate_spline(x_values, spline_coefficients, x)
     return 2000 if z <= layer else 3000
-
 
 # Define 4th-order finite difference laplacian
 def laplacian_4th_order(u, dx):
@@ -134,12 +127,11 @@ def laplacian_4th_order(u, dx):
     for i in range(2, u.shape[0] - 2):
         for j in range(2, u.shape[1] - 2):
             laplacian_u[i, j] = (
-                                        - (1 / 12) * (u[i - 2, j] + u[i + 2, j] + u[i, j - 2] + u[i, j + 2])
-                                        + (4 / 3) * (u[i - 1, j] + u[i + 1, j] + u[i, j - 1] + u[i, j + 1])
-                                        - (5 / 2) * u[i, j]
-                                ) / dx ** 2
+                - (1 / 12) * (u[i - 2, j] + u[i + 2, j] + u[i, j - 2] + u[i, j + 2])
+                + (4 / 3) * (u[i - 1, j] + u[i + 1, j] + u[i, j - 1] + u[i, j + 1])
+                - (5 / 2) * u[i, j]
+            ) / dx ** 2
     return laplacian_u
-
 
 # Main wave propagation loop
 def update_wave(u, dx, dz, dt, t_max, x_grid, z_grid, spline_coefficients, x_max, z_max):
@@ -165,12 +157,11 @@ def update_wave(u, dx, dz, dt, t_max, x_grid, z_grid, spline_coefficients, x_max
         u[:, :, 1] = u[:, :, 2]
 
         # Save snapshots at specific times
-        if np.isclose(n * dt, 0.15, atol=dt) or np.isclose(n * dt, 0.4, atol=dt):
+        if np.isclose(n * dt, 0.15, atol=dt) or np.isclose(n * dt, 0.4, atol=dt) or np.isclose(n * dt, 0.7, atol=dt) or np.isclose(n * dt, 1.0, atol=dt):
             plt.imshow(u[:, :, 1], cmap='seismic', extent=[0, x_max, 0, z_max])
             plt.colorbar(label='Wave Amplitude')
             plt.title(f"Wave Field at t = {n * dt:.2f} seconds")
             plt.show()
-
 
 # Function to animate the wave
 def animate_wave(u, dt, x_max, z_max, nt):
@@ -185,7 +176,6 @@ def animate_wave(u, dt, x_max, z_max, nt):
 
     ani = animation.FuncAnimation(fig, update, frames=range(nt), blit=True)
     plt.show()
-
 
 # Main function
 def main():
@@ -211,6 +201,6 @@ def main():
     # Animate wave field
     animate_wave(u, dt1, x_max, z_max, nt1)
 
-
 if __name__ == '__main__':
     main()
+    print("\nThe script has finished running.")

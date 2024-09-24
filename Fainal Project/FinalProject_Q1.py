@@ -21,6 +21,8 @@ the objective of this script is to solve a problem of the wave equation in 2D sp
             F(t) = 0 for t>0.05
             the source location is at x=3000 meters, z=2800 meters
 
+we will solve the wave equation in the explicit method
+
 there is a layer that defines the speed of the wave, the layer given by series of points: (x,z) = (0,2600), (1000,4000), (2600,3200), (4600,3600), (6000,2400)
 above the layer, the speed of the wave is c1 = 2000 m/s, and below the layer, the speed of the wave is c2 = 3000 m/s
 we will find the layer using cubic spline interpolation
@@ -33,7 +35,7 @@ for dt = 0.03 seconds at t = 0.15,0.3,0.6,0.9 seconds
 
 at the end we will plot animation of the wave field with dt = 0.01 seconds
 
-we will solve the wave equation in the explicit method
+
 
 ---------------------------------------------------------------------------------
 """

@@ -884,6 +884,76 @@ def rk2_method(ode_func, x0, y0, h, xmax):
         y_values.append(y)
     return x_values, np.array(y_values)
 
+
+def eight_tirds_simpson_rule_integration(f, a, b, n=1):
+    """
+    This function calculates the integral of a function using the Simpson's rule
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    x = np.linspace(a, b, n+1)
+    integral = 0
+    h = (b - a) / 3
+
+    if n == 1:
+        return ((3/8)*h) * (f(a) + 3 * f(a + h) + 3 * f(a + 2*h) + f(b))
+    else:
+        for i in range(n):
+            a = x[i]
+            b = x[i + 1]
+            c = (a + b) / 2
+            h = (b - a) / 3
+            integral += ((3/8)*h) * (f(a) + 3 * f(a + h) + 3 * f(a + 2*h) + f(b))
+    return integral
+
+
+def trapezoidal_rule_integration(f, a, b, n=1):
+    """
+    This function calculates the integral of a function using the trapezoidal rule
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    x = np.linspace(a, b, n+1)
+    integral = 0
+    h = (b - a)
+    if n == 1:
+        return 0.5 * h * (f(a) + f(b))
+    else:
+        for i in range(n):
+            a = x[i]
+            b = x[i + 1]
+            h = (b - a)
+            integral += 0.5 * h * (f(a) + f(b))
+    return integral
+
+
+def composite_trapezoidal_rule(f, a, b, n):
+    """
+    This function calculates the integral of a function using the composite trapezoidal rule
+    :param f: the function to integrate given as a lambda function
+    :param a: the lower limit of the integral
+    :param b: the upper limit of the integral
+    :param n: the number of intervals
+    :return: the value of the integral
+    """
+    x = np.linspace(a, b, n + 1)
+    integral = 0
+    h = (b - a) / n
+    for i in range(n+1):
+        if i == 0 or i == n:
+            integral += 0.5 * h * f(x[i])
+        else:
+            integral += h * f(x[i])
+    return integral
+
+
+
 def main():
     pass
 

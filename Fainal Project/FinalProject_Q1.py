@@ -9,6 +9,7 @@ This script is question 1 in the final project for the course intro to numerical
 given an acoustic model with a uniform density and a source (that produces a waves) in at x = 3000 meters, z = 2800 meters
 
 the domain is defined as:
+origin at (0,0) is at the left upper corner, while the positive x-axis is to the right and the positive z-axis is down
 0<=x<=6000 meters
 0<=z<=6000 meters
 
@@ -34,7 +35,11 @@ the objective of this script is to solve a problem of the wave equation in 2D sp
             the source location is at x=3000 meters, z=2800 meters
 
 we will solve the wave equation in the explicit method
-
+we will use the following discretization:
+    ∂^2u/∂x^2 ≈ (-u(x+2Δx,z) + 16u(x+Δx,z) - 30u(x,z) + 16u(x-Δx,z) - u(x-2Δx,z))/(12*Δx^2)
+    ∂^2u/∂z^2 ≈ (-u(x,z+2Δz) + 16u(x,z+Δz) - 30u(x,z) + 16u(x,z-Δz) - u(x,z-2Δz))/(12*Δz^2)
+    ∂^2u/∂t^2 ≈ (u(x,z,t+Δt) - 2u(x,z,t) + u(x,z,t-Δt))/Δt^2
+    where Δx = Δz = h is the spatial step and Δt is the time step
 
 missions:
 
@@ -51,171 +56,233 @@ for Δt = 0.03 s at t = 0.15 s, 0.3 s, 0.6 s, 0.9 s .
 
 ---------------------------------------------------------------------------------
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import numerical_analysis_methods_tools as na_tools
 
 
-def rk4_method_2nd_order(t0, y0, v0, h, tmax, m=None, k=None):
-    t_values = np.arange(t0, tmax + h, h)
-    y_values = [y0]
-    v_values = [v0]
+# Given parameters
+c1 = 2000  # speed of the wave above the layer
+c2 = 3000  # speed of the wave below the layer
+h = 100  # spatial step in meters (Δx = Δz)
+dt1 = 0.01  # time step in seconds
+dt2 = 0.03  # time step in seconds
+t_max = 1  # maximum time in seconds
+t_source_max = 0.05  # maximum time for the source function in seconds
+x_source = 3000  # source location in meters
+z_source = 2800  # source location in meters
+x_max = 6000  # maximum x in meters
+z_max = 6000  # maximum z in meters
 
-    y = y0
-    v = v0
+point_list = [(0, 2600), (1000, 4000), (2600, 3200), (4600, 3600), (6000, 2400)]  # points of the layer
 
-    for t in t_values[:]:
-        f1_y = v
-        f1_v = -0.5*v -7 * y
+# Source function
+def source_function(t):
+    if t <= t_source_max:
+        return t * np.exp(-2 * np.pi * t) * np.sin(2 * np.pi * t)
+    else:
+        return 0
 
-        f2_y = v + h * f1_v / 2
-        f2_v = -0.5*(v + h * f1_v / 2) -7 * (y + h * f1_y / 2)
+def tridiagonal_matrix_algorithm(a, b, c, d):
+    """
+    This function solves a tridiagonal matrix using the Thomas algorithm
+    :param a: the lower diagonal of the matrix
+    :param b: the main diagonal of the matrix
+    :param c: the upper diagonal of the matrix
+    :param d: the right-hand side of the equation
+    :return: the solution of the matrix
+    """
 
-        f3_y = v + h * f2_v / 2
-        f3_v = -0.5*(v + h * f2_v / 2) -7 * (y + h * f2_y / 2)
+    n = len(d)
+    c_ = np.zeros(n - 1)
+    d_ = np.zeros(n)
+    x = np.zeros(n)
 
-        f4_y = v + h * f3_v
-        f4_v = -0.5*(v + h * f3_v) -7 * (y + h * f3_y)
+    c_[0] = c[0] / b[0]
+    d_[0] = d[0] / b[0]
 
-        print('*' * 20, '\n')
-        print('for t =', t, ', y =', round(y,6),', v =', round(v,6))
-        print('\n','*' * 20, '\n','*'* 20)
-        # printing the values of the slopes with round function to 6 decimal points
-        print('f1_y = ',round(v,6) ,f'\nf1_v = -0.5*{round(v,6)} -7*{round(y,6)} = ', round(f1_v, 6))
-        print(f'f2_y = {round(v,6)} + {h/2}*{round(f1_v,6)} = ', round(f2_y, 6), f'\nf2_v = -0.5*({round(v,6)}+{(h/2)}*{round(f1_v, 6)}) -7*({round(y,6)} + {(h/2)}*{round(f1_y, 6)}) = ', round(f2_v, 6))
-        print(f'f3_y = {round(v,6)} + {h/2}*{round(f2_v,6)} = ', round(f3_y, 6), f'\nf3_v = -0.5*({round(v,6)}+{(h/2)}*{round(f2_v, 6)}) -7*({round(y,6)} + {(h/2)}*{round(f2_y, 6)}) = ', round(f3_v, 6))
-        print(f'f4_y = {round(v,6)} + {h}*{round(f3_v,6)} = ', round(f4_y, 6), f'\nf4_v = -0.5*({round(v,6)}+{h}*{round(f3_v, 6)}) -7*({round(y,6)} + {h}*{round(f3_y, 6)}) = ', round(f4_v, 6))
+    for i in range(1, n - 1):
+        denom = b[i] - a[i - 1] * c_[i - 1]
+        c_[i] = c[i] / denom
+        d_[i] = (d[i] - a[i - 1] * d_[i - 1]) / denom
 
-        y += h * (f1_y + 2 * f2_y + 2 * f3_y + f4_y) / 6
-        v += h * (f1_v + 2 * f2_v + 2 * f3_v + f4_v) / 6
+    d_[-1] = (d[-1] - a[-2] * d_[-2]) / (b[-1] - a[-2] * c_[-2])
 
-        y_values.append(y)
-        v_values.append(v)
+    x[-1] = d_[-1]
+    for i in range(n - 2, -1, -1):
+        x[i] = d_[i] - c_[i] * x[i + 1]
 
-    print('\n')
-    print('*' * 20, '\n')
-    print("summary of the results:")
-    print(f'for x =0 to x = 2 with h = {h}')
-    print(f'y(0) = {y0}, v(0) = {v0}')
-    print(f'y(0.5) = {y_values[1]}, v(0.5) = {v_values[1]}')
-    print(f'y(1) = {y_values[2]}, v(1) = {v_values[2]}')
-    print(f'y(1.5) = {y_values[3]}, v(1.5) = {v_values[3]}')
-    print(f'y(2) = {y_values[4]}, v(2) = {v_values[4]}')
+    return x
+
+def cubic_spline_interpolation(x_i, y_i):
+    """
+    This function calculates the cubic spline interpolation of a given set of points
+    :param x_i: the x values of the points
+    :param y_i: the y values of the points
+    :return: the coefficients of the cubic spline
+    """
+    n = len(x_i)
+    h = np.diff(x_i)
+
+    a = y_i[:-1]
+    alpha = np.zeros(n - 1)
+
+    for i in range(1, n - 1):
+        alpha[i] = (3 / h[i] * (y_i[i + 1] - y_i[i]) - 3 / h[i - 1] * (y_i[i] - y_i[i - 1]))  # coeffs for cubic spline
+
+    l = np.ones(n)
+    mu = np.zeros(n - 1)
+    z = np.zeros(n)
+
+    l[0] = 1
+    for i in range(1, n - 1):
+        l[i] = 2 * (x_i[i + 1] - x_i[i - 1]) - h[i - 1] * mu[i - 1]
+        mu[i] = h[i] / l[i]
+        z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i]
+
+    l[-1] = 1
+    z[-1] = 0
+
+    b = np.zeros(n - 1)
+    c = np.zeros(n)
+    d = np.zeros(n - 1)
+
+    for j in range(n - 2, -1, -1):
+        c[j] = z[j] - mu[j] * c[j + 1]
+        b[j] = (y_i[j + 1] - y_i[j]) / h[j] - h[j] * (c[j + 1] + 2 * c[j]) / 3
+        d[j] = (c[j + 1] - c[j]) / (3 * h[j])
+
+    return a, b, c, d
+
+# Create the cubic spline interpolation of the layer
+x_i = [point[0] for point in point_list]
+y_i = [ point[1] for point in point_list]  # Flip z-values to adjust for the layer (coordinates change)
+a, b, c, d = cubic_spline_interpolation(x_i, y_i)
+
+print('Cubic Spline Interpolation Coefficients:')
+for i in range(len(a)):
+    print(f'a_{i} = {a[i]}, b_{i} = {b[i]}, c_{i} = {c[i]}, d_{i} = {d[i]}')
 
 
-    return t_values, np.array(y_values), np.array(v_values)
+# Plot the cubic spline interpolation of the layer
+x = np.linspace(0, x_max, 1000)
+y = np.linspace(0, z_max, 1000)
+for i in range(len(x_i) - 1):
+    mask = (x >= x_i[i]) & (x <= x_i[i + 1])
+    y[mask] = a[i] + b[i] * (x[mask] - x_i[i]) + c[i] * (x[mask] - x_i[i]) ** 2 + d[i] * (x[mask] - x_i[i   ]) ** 3
 
-rk4_method_2nd_order(0,4,0,0.5,2)
+plt.figure(figsize=(10, 6))
+plt.plot(x, y, label='Cubic Spline Interpolation', color='brown', linewidth=2)
+plt.scatter(x_i, y_i, color='black', label='Layer Points')
+plt.scatter(x_source,  z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
+
+# Flip the z-axis to make the values increase downward
+plt.gca().invert_yaxis()
+
+plt.xlabel('x (m)', fontsize=12)
+plt.ylabel('z (m)', fontsize=12)
+plt.title('Cubic Spline Interpolation of the Layer', fontsize=14)
+plt.legend()
+plt.grid()
+plt.show()
 
 
-import numpy as np
+# Solve the wave equation using the explicit method
+def second_order_derivative_for_time(u, dt):
+    """
+    This function calculates the second-order derivative for time
+    :param u: the wave function
+    :param dt: the time step
+    :return: the second-order derivative for time
+    """
+    return (u[2:] - 2 * u[1:-1] + u[:-2]) / dt ** 2
 
-def rk4_method_2nd_order(x0, y0, z0, h, xmax):
-    x_values = np.arange(x0, xmax + h, h)
-    y_values = [y0]
-    z_values = [z0]
+def forward_second_order_difference_for_time(u, dt):
+    """
+    This function calculates the forward second-order difference for time
+    :param u: the wave function
+    :param dt: the time step
+    :return: the forward second-order difference for time
+    """
+    return (-3 * u[0:-2] + 4 * u[1:-1] - u[2:]) / (2 * dt)
 
-    y = y0
-    z = z0
 
-    for x in x_values[:]:
-        k1 = z
-        l1 = -0.5 * z - 7 * y
 
-        k2 = z + h * l1 / 2
-        l2 = -0.5 * (z + h * l1 / 2) - 7 * (y + h * k1 / 2)
+def fourth_order_finite_difference_laplace(u, dx = 100, dz = 100):
+    """
+    This function calculates the fourth-order finite difference for the Laplace operator
+    :param u: the wave function
+    :param dx: the spatial step in x
+    :param dz: the spatial step in z
+    :return: the fourth-order finite difference for the Laplace operator
+    """
+    return (-u[4:] + 16 * u[3:-1] - 30 * u[2:-2] + 16 * u[1:-3] - u[:-4]) / (12 * dx ** 2) + \
+           (-u[2 * len(u):] + 16 * u[len(u):] - 30 * u + 16 * u[:-len(u)] - u[:-2 * len(u)]) / (12 * dz ** 2)
 
-        k3 = z + h * l2 / 2
-        l3 = -0.5 * (z + h * l2 / 2) - 7 * (y + h * k2 / 2)
+# check if the points are above or below the layer
+def wave_speed(x, z):
+    """
+    This function calculates the wave speed based on the location of the wave
+    :param x: the x-coordinate
+    :param z: the z-coordinate
+    :return: the wave speed
+    """
+    if z >= a[0] + b[0] * x + c[0] * x ** 2 + d[0] * x ** 3:
+        return c1
+    else:
+        return c2
 
-        k4 = z + h * l3
-        l4 = -0.5 * (z + h * l3) - 7 * (y + h * k3)
+# Create the grid
 
-        print('*' * 20, '\n')
 
-        print('For x =', x, ', y =', round(y, 6), ', z =', round(z, 6))
-        print('\n', '*' * 20, '\n', '*' * 20)
-        # Printing the values of the slopes rounded to 6 decimal points
-        print('k1 = ', round(k1, 6), f'\nl1 = -0.5*{round(z, 6)} - 7*{round(y, 6)} = ', round(l1, 6))
-        print(f'k2 = {round(z, 6)} + {h/2}*{round(l1, 6)} = ', round(k2, 6),
-              f'\nl2 = -0.5*({round(z, 6)} + {h/2}*{round(l1, 6)}) - 7*({round(y, 6)} + {h/2}*{round(k1, 6)}) = ',
-              round(l2, 6))
-        print(f'k3 = {round(z, 6)} + {h/2}*{round(l2, 6)} = ', round(k3, 6),
-              f'\nl3 = -0.5*({round(z, 6)} + {h/2}*{round(l2, 6)}) - 7*({round(y, 6)} + {h/2}*{round(k2, 6)}) = ',
-              round(l3, 6))
-        print(f'k4 = {round(z, 6)} + {h}*{round(l3, 6)} = ', round(k4, 6),
-              f'\nl4 = -0.5*({round(z, 6)} + {h}*{round(l3, 6)}) - 7*({round(y, 6)} + {h}*{round(k3, 6)}) = ',
-              round(l4, 6))
+def wave_equation_solver_explisit_next_step(u, u_new, u_old, F, dt, dx, dz):
+    """
+    This function calculates the next step of the wave equation using the explicit method
+    :param u: the wave function
+    :param u_new: the new wave function
+    :param u_old: the old wave function
+    :param F: the source function
+    :param dt: the time step
+    :param dx: the spatial step in x
+    :param dz: the spatial step in z
+    :return: the new wave function
+    """
+    c = wave_speed(X, Z)
+    u_new[1:-1, 1:-1] = 2 * u[1:-1, 1:-1] - u_old[1:-1, 1:-1] + c ** 2 * dt ** 2 * (
+            fourth_order_finite_difference_laplace(u, dx, dz) + F)
+    return u_new
 
-        y += h * (k1 + 2 * k2 + 2 * k3 + k4) / 6
-        z += h * (l1 + 2 * l2 + 2 * l3 + l4) / 6
-        print('\n')
-        print('-' * 20)
-        print(f'y({x+h}) = y({x}) + h * ({round(k1,4 )} + 2 * {round(k2, 4)} + 2 * {round(k3, 4)} + {round(k4, 4)}) / 6 = ', round(y, 6), f'\nz({x+h}) = z({x}) + h * ({round(l1,4 )} + 2 * {round(l2, 4)} + 2 * {round(l3, 4)} + {round(l4, 4)}) / 6 = ', round(z, 6))
-        print('-' * 20)
-        print('\n')
-        y_values.append(y)
-        z_values.append(z)
+# Create the grid
+X, Z = np.meshgrid(np.arange(0, x_max + h, h), np.arange(0, z_max + h, h))
+U = np.zeros_like(X)
+U_new = np.zeros_like(X)
+U_old = np.zeros_like(X)
 
-    print('\n')
-    print('*' * 20, '\n')
-    print("Summary of the results:")
-    print(f'For x = 0 to x = 2 with h = {h}')
-    print(f'y(0) = {y0}, z(0) = {z0}')
-    print(f'y(0.5) = {y_values[1]}, z(0.5) = {z_values[1]}')
-    print(f'y(1) = {y_values[2]}, z(1) = {z_values[2]}')
-    print(f'y(1.5) = {y_values[3]}, z(1.5) = {z_values[3]}')
-    print(f'y(2) = {y_values[4]}, z(2) = {z_values[4]}')
+t = np.linspace(0, t_max, int(t_max / dt1) + 1)
+def initialize_source_function(t):
+    F = np.zeros_like(X)
+    if t <= t_source_max:
+        F = t * np.exp(-2 * np.pi * t) * np.sin(2 * np.pi * t)
+    return F
+for time in t:
+    F = source_function(time)
+    print(F)
 
-    return x_values, np.array(y_values), np.array(z_values)
 
-# Example usage
-rk4_method_2nd_order(0, 4, 0, 0.5, 2)
+# solve the wave equation
+for time in t:
+    F = initialize_source_function(time)
+    U_new = wave_equation_solver_explisit_next_step(U, U_new, U_old, F, dt1, h, h)
+    U_old = U.copy()
+    U = U_new.copy()
 
-import numpy as np
-
-# Parameters
-k = 0.49  # Thermal conductivity (cal/cm/s/C)
-q = 1.0  # Heat flux (cal/cm^2/s)
-dx = 1.0  # Grid spacing (cm)
-dy = 1.0
-
-# Initialize the grid
-T = np.zeros((4, 5))  # 4 rows (y), 5 columns (x)
-
-# Boundary conditions
-T[0, :] = 100  # Top boundary
-T[:, 0] = 75  # Left boundary
-T[:, -1] = 0  # Right boundary initially (updated later with flux)
-# Bottom boundary: flux boundary condition will be applied iteratively
-
-# Iterative solver parameters
-tolerance = 1e-6  # Convergence tolerance
-max_iterations = 1000  # Maximum number of iterations
-
-# Iterate using Gauss-Seidel method
-for iteration in range(max_iterations):
-    T_old = T.copy()
-
-    # Update interior points
-    for i in range(1, 3):  # Only rows 1 and 2 (interior rows)
-        for j in range(1, 4):  # Only columns 1 to 3 (interior columns)
-            T[i, j] = 0.25 * (T[i + 1, j] + T[i - 1, j] + T[i, j + 1] + T[i, j - 1])
-
-    # Update bottom boundary (flux condition)
-    T[3, 1:4] = T[2, 1:4] - q / k  # Bottom boundary
-
-    # Update right boundary (flux condition)
-    T[1:3, 4] = T[1:3, 3] - q / k  # Right boundary
-
-    # Check for convergence
-    max_diff = np.max(np.abs(T - T_old))
-    if max_diff < tolerance:
-        break
-
-# Results
-print('\n', '*' * 20, '\n')
-print(f"Converged after {iteration + 1} iterations")
-print("Temperature distribution:")
-print(T)
+    # Plot the wave field
+    plt.figure(figsize=(10, 6))
+    plt.pcolormesh(X, Z, U, cmap='coolwarm')
+    plt.colorbar()
+    plt.xlabel('x (m)', fontsize=12)
+    plt.ylabel('z (m)', fontsize=12)
+    plt.title(f'Wave Field at time t={time:.2f} s', fontsize=14)
+    plt.grid()
+    plt.show()

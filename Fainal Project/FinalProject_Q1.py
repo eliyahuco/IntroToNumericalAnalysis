@@ -87,9 +87,9 @@ y_i = [ point[1] for point in point_list]
 
 # Create the grid
 X, Z = np.meshgrid(np.arange(0, x_max + h, h), np.arange(0, z_max + h, h))
-u_n_plus_1 = np.zeros_like(X)
-u_n = np.zeros_like(X)
-u_n_minus_1 = np.zeros_like(X)
+u_n_plus_1 = np.zeros_like(X, dtype=float)
+u_n = np.zeros_like(X, dtype=float)
+u_n_minus_1 = np.zeros_like(X, dtype=float)
 
 # Source function
 def source_function(t, t_source_max=0.05):
@@ -280,13 +280,6 @@ y_i = [point[1] for point in point_list]
 # Compute cubic spline coefficients
 a, b, c, d = cubic_spline_interpolation(x_i, y_i)
 
-# Test cases for wave speed
-print(wave_speed(0, 2600, c1=2000, c2=3000, a=a, b=b, c=c, d=d, x_i=x_i))  # Expected c1
-print(wave_speed(1000, 4000, c1=2000, c2=3000, a=a, b=b, c=c, d=d, x_i=x_i))  # Expected c2
-print(wave_speed(2600, 3200, c1=2000, c2=3000, a=a, b=b, c=c, d=d, x_i=x_i))  # Expected c2
-
-
-
 
 
 # Initialize the wave speed field
@@ -318,31 +311,49 @@ def initialize_wave_field(u0, u1, x_source_idx, z_source_idx, dt):
         tuple: Updated u0 and u1
     """
     u0[z_source_idx, x_source_idx] = source_function(0)
-    u1[z_source_idx, x_source_idx] = source_function(dt)
+    u1[z_source_idx, x_source_idx] = source_function(dt, t_source_max=0.05)
     return u0, u1
 
-
+print(source_function(0.01, t_source_max=0.05))
 # Get source indices
 x_source_idx = int(x_source / h)
 z_source_idx = int(z_source / h)
 
 # Initialize wave field and speed field
-u_n_minus_1, u_n = initialize_wave_field(u_n_minus_1, u_n, x_source_idx, z_source_idx, dt1)
+u_n_minus_1, u_n = initialize_wave_field(u_n_minus_1, u_n, 30, 28, 0.01)
 speed_field = initialize_speed_field()
+
+# u_n[30,28]   = source_function(0.01, t_source_max=0.05)
+print(u_n[30,28])
+
 
 # Display wave speed field
 plt.figure(figsize=(10, 8), dpi=100)
+
+
 plt.pcolormesh(X, Z, speed_field, cmap="coolwarm")
-plt.colorbar(label="Wave Speed (m/s)")
+plt.colorbar(label="Wave velocity (m/s)")
+plt.plot(x, y, label='Cubic Spline Interpolation', color='black', linewidth=2)
+plt.scatter(x_i, y_i, color='black', label='Layer Points')
+plt.scatter(x_source,  z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
 plt.xlabel("x (m)", fontsize=12)
 plt.ylabel("z (m)", fontsize=12)
-plt.title("Wave Speed Field", fontsize=14)
+plt.title("Wave velocity field", fontsize=14)
+plt.legend()
 plt.gca().invert_yaxis()
 plt.grid()
 plt.show()
 
-def wave_equation_solver_explisit_next_step(u_n, u_n_plus_1, u_n_minus_1, F, dx, dz,dt):
-    pass
+def u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt, dx, dz,source_function):
+
+    u_plus_1 = np.zeros_like(u_n)
+    for i in range(2, u_n.shape[0] - 2):
+        for j in range(2, u_n.shape[1] - 2):
+            u_plus_1 = (2 * u_n[i, j] - u_n_minus_1[i, j] + (speed_field[i, j] ** 2 * dt ** 2) * laplace_operator_forth_order(u_n, dx, dz)
+                        + source_function(dt,t_source_max)*dt**2)
+    return u_plus_1
+
+print(u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt1, h, h, source_function))
 
 
 

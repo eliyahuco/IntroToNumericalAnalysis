@@ -245,6 +245,9 @@ def u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt, dx, dz,source_function
 
 
 
+
+
+
 # Plot the cubic spline interpolation of the layer
 
 
@@ -340,12 +343,13 @@ def main():
     plt.grid()
     plt.show()
 
+    u_n_list_dt_1 = []
+    u_n_list_dt_2 = []
     plt.figure(figsize=(10, 8), dpi=100)
     for d in range( len(dt)):
         u_n[30, 28] = source_function(dt[d], t_source_max)
         for t in np.arange(2*dt[d], t_max + dt[d] , dt[d]):
             t = round(t, 2)
-            print(t)
             # Update the wave field
             for i in range(2, u_n.shape[0] - 2):
                 for j in range(2, u_n.shape[1] - 2):
@@ -354,6 +358,12 @@ def main():
             u_n_minus_1 = u_n.copy()
             u_n = u_n_plus_1.copy()
             u_n_plus_1 = np.zeros_like(X, dtype=float)
+
+            if dt[d] == dt1:
+                u_n_list_dt_1.append(u_n)
+            else:
+                u_n_list_dt_2.append(u_n)
+
 
             # Plot the wave field
             # if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
@@ -378,11 +388,10 @@ def main():
             # save the plot as animation
 
 
+
+
         plt.show()
         plt.figure(figsize=(10, 8), dpi=100)
-
-
-
 
 
 

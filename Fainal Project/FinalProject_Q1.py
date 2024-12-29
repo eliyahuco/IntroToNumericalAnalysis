@@ -81,22 +81,14 @@ x_line = np.linspace(0, 6000, 10000000)  # x values for the cubic spline interpo
 z_line = np.zeros_like(x_line)  # z values for the cubic spline interpolation of the layer
 
 point_list = [(0, 2600), (1000, 4000), (2600, 3200), (4600, 3600), (6000, 2400)]  # points of the layer
-x_i = [point[0] for point in point_list]
-y_i = [ point[1] for point in point_list]
+
 
 
 # Create the grid
-X, Z = np.meshgrid(np.arange(0, x_max + h, h), np.arange(0, z_max + h, h))
-u_n_plus_1 = np.zeros_like(X, dtype=float)
-u_n = np.zeros_like(X, dtype=float)
-u_n_minus_1 = np.zeros_like(X, dtype=float)
+
 
 # Source function
-def source_function(t, t_source_max=0.05):
-    if t <= t_source_max:
-        return t * np.exp(-2 * np.pi * t) * np.sin(2 * np.pi * t)
-    else:
-        return 0
+
 
 def tridiagonal_matrix_algorithm(a, b, c, d):
     """
@@ -169,56 +161,11 @@ def cubic_spline_interpolation(x_i, y_i):
 
     return a, b, c, d
 
-# Create the cubic spline interpolation of the layer
-x_i = [point[0] for point in point_list]
-y_i = [ point[1] for point in point_list]  # Flip z-values to adjust for the layer (coordinates change)
-
-a, b, c, d = cubic_spline_interpolation(x_i, y_i)
-
-print('Cubic Spline Interpolation Coefficients:')
-for i in range(len(a)):
-    print(f'a_{i} = {a[i]}, b_{i} = {b[i]}, c_{i} = {c[i]}, d_{i} = {d[i]}')
-
-
-# Plot the cubic spline interpolation of the layer
-x = np.linspace(0, x_max, 1000)
-y = np.linspace(0, z_max, 1000)
-for i in range(len(x_i) - 1):
-    mask = (x >= x_i[i]) & (x <= x_i[i + 1])
-    y[mask] = a[i] + b[i] * (x[mask] - x_i[i]) + c[i] * (x[mask] - x_i[i]) ** 2 + d[i] * (x[mask] - x_i[i   ]) ** 3
-
-
-
-
-
-x_min, x_max = 0, 6000
-z_min, z_max = 0, 6000
-plt.figure(figsize=(10, 8), dpi=100)
-plt.plot(x, y, label='Cubic Spline Interpolation', color='brown', linewidth=2)
-plt.scatter(x_i, y_i, color='black', label='Layer Points')
-plt.scatter(x_source,  z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
-plt.xlim(x_min, x_max)  # Set x-axis range
-plt.ylim(z_min, z_max)
-# Flip the z-axis to make the values increase downward
-plt.gca().invert_yaxis()
-
-plt.xlabel('x (m)', fontsize=12)
-plt.ylabel('z (m)', fontsize=12)
-plt.title('Cubic Spline Interpolation of the Layer', fontsize=14)
-plt.legend()
-plt.grid(True, color='gray', linewidth=0.5, zorder=5, which='both', axis='both')
-plt.show()
-
-
-# Solve the wave equation using the explicit method
-# def second_order_derivative_for_time(u, dt):
-#     """
-#     This function calculates the second-order derivative for time
-#     :param u: the wave function
-#     :param dt: the time step
-#     :return: the second-order derivative for time
-#     """
-#     for n
+def source_function(t, t_source_max=0.05):
+    if t <= t_source_max:
+        return t * np.exp(2 * np.pi * t) * np.sin(2 * np.pi * t)
+    else:
+        return 0
 
 def laplace_operator_forth_order(u, dx=100, dz=100):
     """
@@ -235,7 +182,6 @@ def laplace_operator_forth_order(u, dx=100, dz=100):
             u[i, j] = u_xx + u_zz
     return u
 
-# check if the points are above or below the layer
 def wave_speed(x, z, c1, c2, a, b, c, d, x_i):
     """
     Calculate the wave speed at a given point (x, z) based on the layer's position.
@@ -270,20 +216,7 @@ def wave_speed(x, z, c1, c2, a, b, c, d, x_i):
     else:
         return c2
 
-
-# Test the wave speed function
-# Cubic spline coefficients and layer points
-point_list = [(0, 2600), (1000, 4000), (2600, 3200), (4600, 3600), (6000, 2400)]
-x_i = [point[0] for point in point_list]
-y_i = [point[1] for point in point_list]
-
-# Compute cubic spline coefficients
-a, b, c, d = cubic_spline_interpolation(x_i, y_i)
-
-
-
-# Initialize the wave speed field
-def initialize_speed_field():
+def initialize_speed_field(X,Z,c1=2000,c2=3000,a=0,b=0,c=0,d=0,x_i=[0,1000,2600,4600,6000]):
     """
     This function initializes the speed field for the grid.
     Returns:
@@ -296,54 +229,6 @@ def initialize_speed_field():
     speed_field = wave_speed_vectorized(X, Z)
     return speed_field
 
-
-# Initialize the wave field
-def initialize_wave_field(u0, u1, x_source_idx, z_source_idx, dt):
-    """
-    Initializes the wave field at the source location.
-    Parameters:
-        u0 (2D array): Wave function at t=0
-        u1 (2D array): Wave function at t=dt
-        x_source_idx (int): Index of the x-coordinate for the source
-        z_source_idx (int): Index of the z-coordinate for the source
-        dt (float): Time step
-    Returns:
-        tuple: Updated u0 and u1
-    """
-    u0[z_source_idx, x_source_idx] = source_function(0)
-    u1[z_source_idx, x_source_idx] = source_function(dt, t_source_max=0.05)
-    return u0, u1
-
-print(source_function(0.01, t_source_max=0.05))
-# Get source indices
-x_source_idx = int(x_source / h)
-z_source_idx = int(z_source / h)
-
-# Initialize wave field and speed field
-u_n_minus_1, u_n = initialize_wave_field(u_n_minus_1, u_n, 30, 28, 0.01)
-speed_field = initialize_speed_field()
-
-# u_n[30,28]   = source_function(0.01, t_source_max=0.05)
-print(u_n[30,28])
-
-
-# Display wave speed field
-plt.figure(figsize=(10, 8), dpi=100)
-
-
-plt.pcolormesh(X, Z, speed_field, cmap="coolwarm")
-plt.colorbar(label="Wave velocity (m/s)")
-plt.plot(x, y, label='Cubic Spline Interpolation', color='black', linewidth=2)
-plt.scatter(x_i, y_i, color='black', label='Layer Points')
-plt.scatter(x_source,  z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
-plt.xlabel("x (m)", fontsize=12)
-plt.ylabel("z (m)", fontsize=12)
-plt.title("Wave velocity field", fontsize=14)
-plt.legend()
-plt.gca().invert_yaxis()
-plt.grid()
-plt.show()
-
 def u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt, dx, dz,source_function):
 
     u_plus_1 = np.zeros_like(u_n)
@@ -353,7 +238,155 @@ def u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt, dx, dz,source_function
                         + source_function(dt,t_source_max)*dt**2)
     return u_plus_1
 
-print(u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt1, h, h, source_function))
+
+
+
+
+
+
+
+# Plot the cubic spline interpolation of the layer
+
+
+#
+#
+#
+#
+#
+# x_min, x_max = 0, 6000
+# z_min, z_max = 0, 6000
+# plt.figure(figsize=(10, 8), dpi=100)
+# plt.plot(x, y, label='Cubic Spline Interpolation', color='brown', linewidth=2)
+# plt.scatter(x_i, y_i, color='black', label='Layer Points')
+# plt.scatter(x_source,  z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
+# plt.xlim(x_min, x_max)  # Set x-axis range
+# plt.ylim(z_min, z_max)
+# # Flip the z-axis to make the values increase downward
+# plt.gca().invert_yaxis()
+#
+# plt.xlabel('x (m)', fontsize=12)
+# plt.ylabel('z (m)', fontsize=12)
+# plt.title('Cubic Spline Interpolation of the Layer', fontsize=14)
+# plt.legend()
+# plt.grid(True, color='gray', linewidth=0.5, zorder=5, which='both', axis='both')
+# plt.show()
+
+
+# Solve the wave equation using the explicit method
+# def second_order_derivative_for_time(u, dt):
+#     """
+#     This function calculates the second-order derivative for time
+#     :param u: the wave function
+#     :param dt: the time step
+#     :return: the second-order derivative for time
+#     """
+#     for n
+
+
+
+# check if the points are above or below the layer
+
+
+
+# Test the wave speed function
+# Cubic spline coefficients and layer points
+
+
+
+
+
+
+# Display wave speed field
+
+
+
+def main():
+    # initialize the grid
+    X, Z = np.meshgrid(x_axis, z_axis)
+
+    # Initialize the speed field with the cubic spline interpolation
+    x_i = [point[0] for point in point_list]
+    y_i = [point[1] for point in point_list]
+    a, b, c, d = cubic_spline_interpolation(x_i, y_i)
+    x = np.linspace(0, x_max, 1000)
+    y = np.linspace(0, z_max, 1000)
+
+    for i in range(len(x_i) - 1):
+        mask = (x >= x_i[i]) & (x <= x_i[i + 1])
+        y[mask] = a[i] + b[i] * (x[mask] - x_i[i]) + c[i] * (x[mask] - x_i[i]) ** 2 + d[i] * (x[mask] - x_i[i]) ** 3
+    speed_field = initialize_speed_field(X,Z,c1,c2,a,b,c,d,x_i)
+
+    # initialize the wave field
+    u_n_plus_1 = np.zeros_like(X, dtype=float)
+    u_n = np.zeros_like(X, dtype=float)
+    u_n_minus_1 = np.zeros_like(X, dtype=float)
+    dt = [dt1, dt2]
+
+    u_n[30, 28] = source_function(dt[0], t_source_max)
+    print(u_n[30, 28])
+
+    plt.figure(figsize=(10, 8), dpi=100)
+    plt.pcolormesh(X, Z, speed_field, cmap="coolwarm")
+    plt.colorbar(label="Wave velocity (m/s)")
+    plt.plot(x, y, label='Cubic Spline Interpolation', color='black', linewidth=2)
+    plt.scatter(x_i, y_i, color='black', label='Layer Points')
+    plt.scatter(x_source, z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
+    plt.xlabel("x (m)", fontsize=12)
+    plt.ylabel("z (m)", fontsize=12)
+    plt.title("Wave velocity field", fontsize=14)
+    plt.legend()
+    plt.gca().invert_yaxis()
+    plt.grid()
+    plt.show()
+
+    plt.figure(figsize=(10, 8), dpi=100)
+    for d in range( len(dt)):
+        u_n[30, 28] = source_function(dt[d], t_source_max)
+        for t in np.arange(2*dt[d], t_max + dt[d] , dt[d]):
+            t = round(t, 2)
+            print(t)
+            # Update the wave field
+            for i in range(2, u_n.shape[0] - 2):
+                for j in range(2, u_n.shape[1] - 2):
+
+                    u_n_plus_1[i,j] = 2*u_n[i,j] - u_n_minus_1[i,j] + (speed_field[i,j]**2 * dt[d]**2) * (-u_n[i+2,j] + 16*u_n[i+1,j] - 30*u_n[i,j] + 16*u_n[i-1,j] - u_n[i-2,j])/(12*h**2) + (speed_field[i,j]**2 * dt[d]**2) * (-u_n[i,j+2] + 16*u_n[i,j+1] - 30*u_n[i,j] + 16*u_n[i,j-1] - u_n[i,j-2])/(12*h**2) + source_function(t,t_source_max)*dt[d]**2
+            u_n_minus_1 = u_n.copy()
+            u_n = u_n_plus_1.copy()
+
+            # Plot the wave field
+            # if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
+            plt.clf()
+
+            plt.pcolormesh(X, Z, u_n, cmap='coolwarm')
+            plt.colorbar(label='Wave Field')
+            plt.xlabel('x (m)', fontsize=12)
+            plt.ylabel('z (m)', fontsize=12)
+            plt.title(f'Wave Field at time t={t:.2f} s', fontsize=14)
+            plt.gca().invert_yaxis()
+            plt.grid()
+            plt.pause(0.01)
+            # elif t in [0.15, 0.3, 0.6, 0.9] and dt[d] == dt2:
+            #     plt.figure(figsize=(10, 8), dpi=100)
+            #     plt.pcolormesh(X, Z, u_n, cmap='coolwarm')
+            #     plt.colorbar(label='Wave Field')
+            #     plt.xlabel('x (m)', fontsize=12)
+            #     plt.ylabel('z (m)', fontsize=12)
+            #     plt.title(f'Wave Field at time t={t:.2f} s', fontsize=14)
+            #     plt.gca().invert_yaxis()
+            #     plt.grid()
+            #     plt.show()
+
+        plt.show()
+        plt.figure(figsize=(10, 8), dpi=100)
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    main()
 
 
 

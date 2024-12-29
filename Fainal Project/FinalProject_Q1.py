@@ -322,8 +322,9 @@ def main():
     u_n_minus_1 = np.zeros_like(X, dtype=float)
     dt = [dt1, dt2]
 
-    u_n[30, 28] = source_function(dt[0], t_source_max)
+    u_n[30, 28] = source_function(dt[1], t_source_max)
     print(u_n[30, 28])
+    print(u_n[25:35, 25:35])
 
     plt.figure(figsize=(10, 8), dpi=100)
     plt.pcolormesh(X, Z, speed_field, cmap="coolwarm")
@@ -349,9 +350,10 @@ def main():
             for i in range(2, u_n.shape[0] - 2):
                 for j in range(2, u_n.shape[1] - 2):
 
-                    u_n_plus_1[i,j] = 2*u_n[i,j] - u_n_minus_1[i,j] + (speed_field[i,j]**2 * dt[d]**2) * (-u_n[i+2,j] + 16*u_n[i+1,j] - 30*u_n[i,j] + 16*u_n[i-1,j] - u_n[i-2,j])/(12*h**2) + (speed_field[i,j]**2 * dt[d]**2) * (-u_n[i,j+2] + 16*u_n[i,j+1] - 30*u_n[i,j] + 16*u_n[i,j-1] - u_n[i,j-2])/(12*h**2) + source_function(t,t_source_max)*dt[d]**2
+                    u_n_plus_1[i,j] = 2*u_n[i,j] - u_n_minus_1[i,j] + (speed_field[i,j]**2 * dt[d]**2)/(12*h**2) * (-u_n[i+2,j] + 16*u_n[i+1,j] - 60*u_n[i,j] + 16*u_n[i-1,j] - u_n[i-2,j] -u_n[i,j+2] + 16*u_n[i,j+1]  + 16*u_n[i,j-1] - u_n[i,j-2])+ source_function(t,t_source_max)*dt[d]**2
             u_n_minus_1 = u_n.copy()
             u_n = u_n_plus_1.copy()
+            u_n_plus_1 = np.zeros_like(X, dtype=float)
 
             # Plot the wave field
             # if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
@@ -364,17 +366,17 @@ def main():
             plt.title(f'Wave Field at time t={t:.2f} s', fontsize=14)
             plt.gca().invert_yaxis()
             plt.grid()
-            plt.pause(0.01)
-            # elif t in [0.15, 0.3, 0.6, 0.9] and dt[d] == dt2:
-            #     plt.figure(figsize=(10, 8), dpi=100)
-            #     plt.pcolormesh(X, Z, u_n, cmap='coolwarm')
-            #     plt.colorbar(label='Wave Field')
-            #     plt.xlabel('x (m)', fontsize=12)
-            #     plt.ylabel('z (m)', fontsize=12)
-            #     plt.title(f'Wave Field at time t={t:.2f} s', fontsize=14)
-            #     plt.gca().invert_yaxis()
-            #     plt.grid()
-            #     plt.show()
+            if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
+                # save the plot
+                plt.savefig(f'Wave_Field_t_{t}_dt_{dt[d]}.png')
+            elif t in [0.15, 0.3, 0.6, 0.9] and dt[d] == dt2:
+                # save the plot
+                plt.savefig(f'Wave_Field_t_{t}_dt_{dt[d]}.png')
+
+            plt.pause(dt[d])
+
+            # save the plot as animation
+
 
         plt.show()
         plt.figure(figsize=(10, 8), dpi=100)

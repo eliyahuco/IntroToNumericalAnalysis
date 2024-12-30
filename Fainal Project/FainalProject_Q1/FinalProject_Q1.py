@@ -303,69 +303,6 @@ def animate_wave(U_snapshots, dt, dx, save_path="wave_animation.mp4"):
     print(f'Animation saved at "{save_path}"\n')
 
 
-
-
-
-
-
-
-
-
-# Plot the cubic spline interpolation of the layer
-
-
-#
-#
-#
-#
-#
-# x_min, x_max = 0, 6000
-# z_min, z_max = 0, 6000
-# plt.figure(figsize=(10, 8), dpi=100)
-# plt.plot(x, y, label='Cubic Spline Interpolation', color='brown', linewidth=2)
-# plt.scatter(x_i, y_i, color='black', label='Layer Points')
-# plt.scatter(x_source,  z_source, color='red', label='Source Point (3000, 2800)', marker='*', s=100)
-# plt.xlim(x_min, x_max)  # Set x-axis range
-# plt.ylim(z_min, z_max)
-# # Flip the z-axis to make the values increase downward
-# plt.gca().invert_yaxis()
-#
-# plt.xlabel('x (m)', fontsize=12)
-# plt.ylabel('z (m)', fontsize=12)
-# plt.title('Cubic Spline Interpolation of the Layer', fontsize=14)
-# plt.legend()
-# plt.grid(True, color='gray', linewidth=0.5, zorder=5, which='both', axis='both')
-# plt.show()
-
-
-# Solve the wave equation using the explicit method
-# def second_order_derivative_for_time(u, dt):
-#     """
-#     This function calculates the second-order derivative for time
-#     :param u: the wave function
-#     :param dt: the time step
-#     :return: the second-order derivative for time
-#     """
-#     for n
-
-
-
-# check if the points are above or below the layer
-
-
-
-# Test the wave speed function
-# Cubic spline coefficients and layer points
-
-
-
-
-
-
-# Display wave speed field
-
-
-
 def main():
     # initialize the grid
     X, Z = np.meshgrid(x_axis, z_axis)

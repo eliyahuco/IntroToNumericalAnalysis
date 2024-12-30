@@ -274,8 +274,6 @@ def animate_wave(U_snapshots, dt, dx, save_path="wave_animation.mp4"):
     y = np.linspace(0, (n - 1) * dx, n)
     X, Y = np.meshgrid(x, y)
 
-
-
     # Initialize the plot with the first snapshot
     wave_plot = ax.pcolormesh(X, Y, U_snapshots[0], shading='auto', cmap='coolwarm')
     ax.set_title("Wave Field Animation for {} s".format(len(U_snapshots) * dt))

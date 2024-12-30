@@ -384,10 +384,10 @@ def main():
             plt.grid()
             if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
                 # save the plot
-                plt.savefig(f'Wave_Field_t_{t}_dt_{dt[d]}.png')
+                plt.savefig(f'Wave_Field_for_dt_{dt[d]}_at t = {t}_.png')
             elif t in [0.15, 0.3, 0.6, 0.9] and dt[d] == dt2:
                 # save the plot
-                plt.savefig(f'Wave_Field_t_{t}_dt_{dt[d]}.png')
+                plt.savefig(f'Wave_Field_for_dt_{dt[d]}_at t = {t}.png')
 
             plt.pause(dt1)
 
@@ -401,9 +401,9 @@ def main():
         # Create the animation
 
         if dt[d] == dt1:
-            animate_wave(u_n_list_dt_1, dt[d], h, save_path="wave_animation_dt_0.01..mp4")
+            animate_wave(u_n_list_dt_1, dt[d], h, save_path="wave_animation_dt_0.01.gif")
         else:
-            animate_wave(u_n_list_dt_2, dt[d], h, save_path="wave_animation_dt_0.03..mp4")
+            animate_wave(u_n_list_dt_2, dt[d], h, save_path="wave_animation_dt_0.03.gif")
 
 
 

@@ -40,7 +40,7 @@ the equation is:
         ∂^2T/∂x^2 ≈ (T(i+1,j) - 2T(i,j) + T(i-1,j))/Δx^2
         ∂^2T/∂y^2 ≈ (T(i,j+1) - 2T(i,j) + T(i,j-1))/Δy^2
         ∂T/∂t ≈ (T(i,j,n+1) - T(i,j,n))/dt
-        where Δx = Δy = 0.5 [m], Δt = 0.1 [s]
+        where Δx = Δy = 0.05 [m], Δt = 0.1 [s]
 
 missions:
 
@@ -60,8 +60,8 @@ import matplotlib.animation as animation
 κ = 1.786*10**-3
 σ_x = 0.00625
 σ_y = 0.00625
-Δx = 0.5
-Δy = 0.5
+Δx = 0.05
+Δy = 0.05
 Δt = 0.1
 T0 = 10
 Lx = 1.5

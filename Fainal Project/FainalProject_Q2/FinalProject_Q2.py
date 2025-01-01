@@ -57,19 +57,22 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
 # Constants
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+# Constants
 k = 1.786 * 10 ** -3  # m^2/s
 sigma_x = 0.00625  # meters
 sigma_y = 0.00625  # meters
-h = 0.05  # meters (Δx = Δy)
+h = 0.05  # meters (\u0394x = \u0394y)
 dt = 0.1  # seconds
 Lx = 1.5  # meters
 Ly = 1.5  # meters
 T0 = 10  # [C]
 alpha = (k * dt) / (h ** 2)
 
-heat_sink =  lambda x, y, t: -(10 ** 4) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(-((y - 0.5) ** 2 / (2 * sigma_y ** 2))) * np.exp(-0.1 * t)
-
-
+heat_sink = lambda x, y, t: -(10 ** 4) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(-((y - 0.5) ** 2 / (2 * sigma_y ** 2))) * np.exp(-0.1 * t)
 
 # Grid
 x = np.arange(0, Lx + h, h)
@@ -82,21 +85,18 @@ T[:, :, 0] = T0
 T[:, 0, :] = 100
 T[:, -1, :] = 10
 T[-1, :, :] = (100 - 60 * y[:, None])
-
-T[-1, y <= 0.8, :] = (100 - 112.5 * y[y <= 0.8][:, None])
-
-
-
-T[-1, y > 0.8, :] = 10
-
+T[0, y <= 0.8, :] = (100 - 112.5 * y[y <= 0.8][:, None])
+T[0, y > 0.8, :] = 10
+print(T.shape)
+print(T)
 def tridiagonal_matrix_algorithm(a, b, c, d):
     """
-    This function solves a tridiagonal matrix using the Thomas algorithm
-    :param a: the lower diagonal of the matrix
-    :param b: the main diagonal of the matrix
-    :param c: the upper diagonal of the matrix
-    :param d: the right-hand side of the equation
-    :return: the solution of the matrix
+    Solve a tridiagonal matrix algorithm
+    :param a: sub-diagonal
+    :param b: diagonal
+    :param c: super-diagonal
+    :param d: right-hand side
+    :return: solution of the tridiagonal matrix
     """
 
     n = len(d)
@@ -121,20 +121,6 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
     return x
 
 def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
-    """
-    Solves the heat equation using the Alternating Direction Implicit (ADI) method.
-    :param T: 3D temperature matrix (x, y, t)
-    :param alpha: Diffusion coefficient
-    :param heat_sink: Heat sink function (x, y, t)
-    :param dt: Time step size
-    :param x: Grid points in the x direction
-    :param y: Grid points in the y direction
-    :param n: Current time index
-    :param t: Time array
-    :return: Updated temperature matrix T after one time step
-    """
-
-    # Implicit in x direction
     for j in range(1, len(y) - 1):
         a = -alpha * np.ones(len(x) - 2)
         b = (1 + 2 * alpha) * np.ones(len(x) - 2)
@@ -148,7 +134,6 @@ def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
 
         T[1:-1, j, n + 1] = tridiagonal_matrix_algorithm(a, b, c, d)
 
-    # Implicit in y direction
     for i in range(1, len(x) - 1):
         a = -alpha * np.ones(len(y) - 2)
         b = (1 + 2 * alpha) * np.ones(len(y) - 2)
@@ -163,55 +148,8 @@ def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
 
     return T
 
-
 # Solve the heat equation
-for n in range(1, len(t)):
-    T = ADI_method(T, alpha, heat_sink, dt, x, y, n - 1, t)
-
-# Plot the results
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
-X, Y = np.meshgrid(x, y)
-surf = ax.plot_surface(X, Y, T[:, :, 0], cmap=cm.coolwarm, linewidth=0, antialiased=False)
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Temperature [C]')
-ax.set_title('Temperature distribution at t = 0 [s]')
-
-def update_plot(n, T, ax):
-    ax.clear()
-    surf = ax.plot_surface(X, Y, T[:, :, n], cmap=cm.coolwarm, linewidth=0, antialiased=False)
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Temperature [C]')
-    ax.set_title(f'Temperature distribution at t = {t[n]:.1f} [s]')
-    return surf
-
-# Show snapshots of the temperature distribution at t = 15, 30, 60 [s]
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
-X, Y = np.meshgrid(x, y)
-update_plot(15, T, ax)
-plt.show()
-
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
-X, Y = np.meshgrid(x, y)
-update_plot(30, T, ax)
-plt.show()
-
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
-X, Y = np.meshgrid(x, y)
-update_plot(-1, T, ax)
-plt.show()
-
-# Create a complete animation of the temperature distribution for 0<= t <= 60 [s] while we show for every 10 time-steps.
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(111, projection='3d')
-X, Y = np.meshgrid(x, y)
-ani = animation.FuncAnimation(fig, update_plot, frames=range(0, len(t), 10), fargs=(T, ax), repeat=False)
-ani.save('heat_equation.gif', writer='imagemagick', fps=5)
-
-plt.show()
+# Solve the heat equation
+for n in range(len(t) - 1):
+    T = ADI_method(T, alpha, heat_sink, dt, x, y, n, t)
 

@@ -72,13 +72,6 @@ Nt = 601
 T = np.zeros((Nx,Ny,Nt))
 
 # Initial condition
-T[:,:,0] = T0
 
-# Boundary conditions
-T[:,0,:] = 100
-T[:,-1,:] = 10
-T[0,:int(0.8*Ny),:] = (100 - 112.5*np.linspace(0, 0.8, int(0.8*Ny))).reshape(int(0.8*Ny), 1)
-T[0,:int(0.8*Ny),:] = (100 - 112.5*np.linspace(0, 0.8, int(0.8*Ny))).reshape(int(0.8*Ny), 1)
-T[0,int(0.8*Ny):,:] = 10
-
-f(x,y,t) = lambda x,y,t: -10**4*np.exp(-((x-1)**2/(2*σ_x**2)))*np.exp(-((y-0.5)**2/(2*σ_y**2)))*np.exp(-0.1*t)
+f_heat_sink = lambda x,y,t: -10**4*np.exp(-((x-1)**2/(2*σ_x**2)))*np.exp(-((y-0.5)**2/(2*σ_y**2)))*np.exp(-0.1*t)
+print(f_heat_sink(0.75,0.75,0.05))

@@ -61,6 +61,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+
 # Constants
 k = 1.786 * 10 ** -3  # m^2/s
 sigma_x = 0.00625  # meters
@@ -87,15 +88,24 @@ T[:, -1, :] = 10
 T[-1, :, :] = (100 - 60 * y[:, None])
 T[0, y <= 0.8, :] = (100 - 112.5 * y[y <= 0.8][:, None])
 T[0, y > 0.8, :] = 10
-print(T.shape)
-print(T)
+
+T[y <= 0.8, 0, :] = (100 - 112.5 * y[y <= 0.8][:, None])
+T[y > 0.8, 0, :] = 10
+T[0, :, :] = 100
+T[:, :, 0] = T0
+T[-1, : :] = 10
+
+T[:, -1, :] = (100 - 60 * y[:, None])
+
+
+
 def tridiagonal_matrix_algorithm(a, b, c, d):
     """
     Solve a tridiagonal matrix algorithm
-    :param a: sub-diagonal
-    :param b: diagonal
-    :param c: super-diagonal
-    :param d: right-hand side
+    :param a: sub-diagonal in size n-1
+    :param b: diagonal in size n
+    :param c: super-diagonal in size n-1
+    :param d: right-hand side in size n
     :return: solution of the tridiagonal matrix
     """
 
@@ -121,35 +131,86 @@ def tridiagonal_matrix_algorithm(a, b, c, d):
     return x
 
 def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
-    for j in range(1, len(y) - 1):
-        a = -alpha * np.ones(len(x) - 2)
-        b = (1 + 2 * alpha) * np.ones(len(x) - 2)
-        c = -alpha * np.ones(len(x) - 2)
-        d = np.zeros(len(x) - 2)
+    """
+    Solve the heat equation using the Alternating Direction Implicit (ADI) method
+    :param T: temperature matrix
+    :param alpha: alpha parameter
+    :param heat_sink: heat sink function
+    :param dt: time step
+    :param x: x vector
+    :param y: y vector
+    :param n: time index
+    :param t: time vector
+    :return: updated temperature matrix
+    """
+    dt_2 = dt / 2
+    t = np.arange(0, 60 + dt_2, dt_2)
 
+    for j in range(1, len(y) - 1):
+        a = -(alpha/2) * np.ones(len(x) - 3)
+        b = (1 + alpha) * np.ones(len(x) - 2)
+        c = -(alpha/2) * np.ones(len(x) - 3)
+        d = np.zeros(len(x) - 2)
         for i in range(1, len(x) - 1):
-            d[i - 1] = (T[i, j, n] +
-                        alpha * (T[i, j + 1, n] - 2 * T[i, j, n] + T[i, j - 1, n]) +
-                        dt * heat_sink(x[i], y[j], t[n]))
+            d[i-1]  = (1-alpha) * T[i, j, n] + (alpha/2) * (T[i, j + 1, n] + T[i, j - 1, n])  + dt_2 * heat_sink(x[i], y[j], t[n])
 
         T[1:-1, j, n + 1] = tridiagonal_matrix_algorithm(a, b, c, d)
 
     for i in range(1, len(x) - 1):
-        a = -alpha * np.ones(len(y) - 2)
-        b = (1 + 2 * alpha) * np.ones(len(y) - 2)
-        c = -alpha * np.ones(len(y) - 2)
+        a = -(alpha/2) * np.ones(len(y) - 3)
+        b = (1 + alpha) * np.ones(len(y) - 2)
+        c = -(alpha/2) * np.ones(len(y) - 3)
         d = np.zeros(len(y) - 2)
-
         for j in range(1, len(y) - 1):
-            d[j - 1] = (T[i, j, n + 1] +
-                        alpha * (T[i + 1, j, n + 1] - 2 * T[i, j, n + 1] + T[i - 1, j, n + 1]))
+            d[j-1] = (1-alpha) * T[i, j, n + 1] + (alpha/2) * (T[i + 1, j, n + 1] + T[i - 1, j, n + 1]) + dt_2 * heat_sink(x[i], y[j], t[n + 1])
 
         T[i, 1:-1, n + 1] = tridiagonal_matrix_algorithm(a, b, c, d)
 
     return T
 
 # Solve the heat equation
-# Solve the heat equation
-for n in range(len(t) - 1):
+
+
+for n in range(len(t)-1 ):
     T = ADI_method(T, alpha, heat_sink, dt, x, y, n, t)
 
+# Plot the results in 2D
+
+fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+fig.suptitle('Temperature distribution at different times', fontsize=16)
+
+for i, time in enumerate([15, 30, 60]):
+    idx = int(time / dt)
+    im = ax[i].imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
+    ax[i].invert_yaxis()  # Invert the Y-axis for each subplot
+    ax[i].set_title(f't = {time} s')
+    ax[i].set_xlabel('x [m]')
+    ax[i].set_ylabel('y [m]')
+    fig.colorbar(im, ax=ax[i], orientation='vertical', label='Temperature [C]')
+
+# Adjust layout to prevent overlap
+plt.tight_layout(rect=[0, 0, 1, 0.95])
+plt.show()
+plt.savefig('temperature_distribution_snapshots.png')
+# Function to update the frame
+
+fig, ax = plt.subplots()
+im = ax.imshow(T[:, :, 0], cmap='hot', origin='lower', extent=[0, Lx, 0, Ly])
+ax.set_xlabel('x [m]')
+ax.set_ylabel('y [m]')
+cbar = plt.colorbar(im, ax=ax)
+cbar.set_label('Temperature [C]')
+
+
+def animate(i):
+    im.set_array(T[:, :, i])
+    if i % 10 == 0:
+        ax.set_title(f' Temperature distribution at t = {i * dt} s')
+
+    return im,
+
+ani = animation.FuncAnimation(fig, animate, frames=T.shape[2], interval=100, blit=False)
+
+
+plt.show()
+ani.save('temperature_distribution.gif', writer='pillow', fps=10)

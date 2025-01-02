@@ -73,7 +73,7 @@ Ly = 1.5  # meters
 T0 = 10  # [C]
 alpha = (k * dt) / (h ** 2)
 
-heat_sink = lambda x, y, t: -(10 ** 4) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(-((y - 0.5) ** 2 / (2 * sigma_y ** 2))) * np.exp(-0.1 * t)
+heat_sink = lambda x, y, t: -(10 ** (-4)) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(-((y - 0.5) ** 2 / (2 * sigma_y ** 2))) * np.exp(-0.1 * t)
 
 # Grid
 x = np.arange(0, Lx + h, h)
@@ -81,7 +81,7 @@ y = np.arange(0, Ly + h, h)
 t = np.arange(0, 60 + dt, dt)
 
 # Initial condition
-T = np.zeros((len(x), len(y),2* len(t)))  # T(x,y,t) = T(i,j,n) - temperature at position (x,y) at time t
+T = np.zeros((len(x), len(y), len(t)))  # T(x,y,t) = T(i,j,n) - temperature at position (x,y) at time t
 # T[:, :, 0] = T0
 # T[:, 0, :] = 100
 # T[:, -1, :] = 10
@@ -147,8 +147,6 @@ def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
     """
     dt_2 = dt/2
 
-
-
     for j in range(1, len(y)-1):
         a = -(alpha/2) * np.ones(len(x) - 3)
         b = (1 + alpha) * np.ones(len(x) -2)
@@ -185,7 +183,7 @@ def main():
     T0 = 10  # [C]
     alpha = (k * dt) / (h ** 2)
 
-    heat_sink = lambda x, y, t: -(10 ** 4) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(
+    heat_sink = lambda x, y, t: -(10 **(- 4)) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(
         -((y - 0.5) ** 2 / (2 * sigma_y ** 2))) * np.exp(-0.1 * t)
 
     # Grid
@@ -218,7 +216,7 @@ def main():
     print(f'T(0,Y,t) = 10 [C] if 0.8 < y <= 1.5\n')
     print('Solving the heat equation... it may take a while...\n')
 
-    for n in range(T.shape[2] -1 ):
+    for n in range(T.shape[2] - 1):
         T = ADI_method(T, alpha, heat_sink, dt, x, y, n, t)
 
     # Plot the results in 2D
@@ -227,7 +225,7 @@ def main():
         idx = int(time / dt)
         plt.figure(figsize=(6, 5))
         plt.imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
-        plt.gca().invert_yaxis()
+
         plt.title(f'Temperature distribution at t = {time} s')
         plt.xlabel('x [m]')
         plt.ylabel('y [m]')

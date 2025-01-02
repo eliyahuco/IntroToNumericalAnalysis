@@ -81,7 +81,7 @@ y = np.arange(0, Ly + h, h)
 t = np.arange(0, 60 + dt, dt)
 
 # Initial condition
-T = np.zeros((len(x), len(y), len(t)))  # T(x,y,t) = T(i,j,n) - temperature at position (x,y) at time t
+T = np.zeros((len(x), len(y),2* len(t)))  # T(x,y,t) = T(i,j,n) - temperature at position (x,y) at time t
 T[:, :, 0] = T0
 T[:, 0, :] = 100
 T[:, -1, :] = 10
@@ -143,21 +143,22 @@ def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
     :param t: time vector
     :return: updated temperature matrix
     """
-    dt_2 = dt / 2
-    t = np.arange(0, 60 + dt_2, dt_2)
+    dt_2 = dt/2
 
-    for j in range(1, len(y) - 1):
+
+
+    for j in range(1, len(y)-1):
         a = -(alpha/2) * np.ones(len(x) - 3)
-        b = (1 + alpha) * np.ones(len(x) - 2)
+        b = (1 + alpha) * np.ones(len(x) -2)
         c = -(alpha/2) * np.ones(len(x) - 3)
         d = np.zeros(len(x) - 2)
-        for i in range(1, len(x) - 1):
+        for i in range(1, len(x) - 2):
             d[i-1]  = (1-alpha) * T[i, j, n] + (alpha/2) * (T[i, j + 1, n] + T[i, j - 1, n])  + dt_2 * heat_sink(x[i], y[j], t[n])
 
         T[1:-1, j, n + 1] = tridiagonal_matrix_algorithm(a, b, c, d)
 
-    for i in range(1, len(x) - 1):
-        a = -(alpha/2) * np.ones(len(y) - 3)
+    for i in range(1, len(x)-1):
+        a = -(alpha/2) * np.ones(len(y) -3)
         b = (1 + alpha) * np.ones(len(y) - 2)
         c = -(alpha/2) * np.ones(len(y) - 3)
         d = np.zeros(len(y) - 2)
@@ -213,9 +214,9 @@ def main():
     print(f'T(1.5,Y,t) = 100 - 60y [C]\n')
     print(f'T(0,Y,t) = 100 - 112.5y [C] if 0<= y <= 0.8\n')
     print(f'T(0,Y,t) = 10 [C] if 0.8 < y <= 1.5\n')
-    print('Solving the heat equation...\n')
+    print('Solving the heat equation... it may take a while...\n')
 
-    for n in range(len(t)-1 ):
+    for n in range(T.shape[2] -1 ):
         T = ADI_method(T, alpha, heat_sink, dt, x, y, n, t)
 
     # Plot the results in 2D
@@ -224,6 +225,8 @@ def main():
     fig.suptitle('Temperature distribution at different times', fontsize=16)
 
     for i, time in enumerate([15, 30, 60]):
+        print(f'Plotting temperature distribution at t = {time} s\n')
+        print(time)
         idx = int(time / dt)
         im = ax[i].imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
         ax[i].invert_yaxis()  # Invert the Y-axis for each subplot
@@ -234,10 +237,11 @@ def main():
 
     # Adjust layout to prevent overlap
     plt.tight_layout(rect=[0, 0, 1, 0.95])
-    plt.show()
     print('Saving snapshots as temperature_distribution_snapshots.png\n')
     plt.savefig('temperature_distribution_snapshots.png')
     print('Snapshots saved as temperature_distribution_snapshots.png\n')
+    plt.show()
+
     # Function to update the frame
 
     fig, ax = plt.subplots()
@@ -246,6 +250,7 @@ def main():
     ax.set_ylabel('y [m]')
     cbar = plt.colorbar(im, ax=ax)
     cbar.set_label('Temperature [C]')
+    plt.gca().invert_yaxis()
 
 
     def animate(i):

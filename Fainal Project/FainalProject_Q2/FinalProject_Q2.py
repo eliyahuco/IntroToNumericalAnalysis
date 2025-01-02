@@ -223,27 +223,21 @@ def main():
 
     # Plot the results in 2D
 
-    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
-    fig.suptitle('Temperature distribution at different times', fontsize=16)
-
-    for i, time in enumerate([15, 30, 60]):
-        print(f'Plotting temperature distribution at t = {time} s\n')
-        print(time)
+    for time in [15, 30, 60]:
         idx = int(time / dt)
-        im = ax[i].imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
-        ax[i].invert_yaxis()  # Invert the Y-axis for each subplot
-        ax[i].set_title(f't = {time} s')
-        ax[i].set_xlabel('x [m]')
-        ax[i].set_ylabel('y [m]')
-        fig.colorbar(im, ax=ax[i], orientation='vertical', label='Temperature [C]')
+        plt.figure(figsize=(6, 5))
+        plt.imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
+        plt.gca().invert_yaxis()
+        plt.title(f'Temperature distribution at t = {time} s')
+        plt.xlabel('x [m]')
+        plt.ylabel('y [m]')
+        cbar = plt.colorbar()
+        cbar.set_label('Temperature [C]')
+        plt.savefig(f'temperature_distribution_t{time}s.png')
+        plt.show()
 
-    # Adjust layout to prevent overlap
-    plt.tight_layout(rect=[0, 0, 1, 0.95])
-    print('Saving snapshots as temperature_distribution_snapshots.png\n')
-    plt.savefig('temperature_distribution_snapshots.png')
-    print('Snapshots saved as temperature_distribution_snapshots.png\n')
-    plt.show()
-
+    print('snapshots of the temperature distribution at t = 15, 30, 60 [s] saved as temperature_distribution_t15s.png, temperature_distribution_t30s.png, temperature_distribution_t60s.png\n')
+    print('Creating animation... it may take a while...\n')
     # Function to update the frame
 
     fig, ax = plt.subplots()

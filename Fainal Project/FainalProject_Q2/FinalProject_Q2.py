@@ -52,13 +52,6 @@ missions:
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.animation as animation
-
-# Constants
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 
@@ -82,13 +75,6 @@ t = np.arange(0, 60 + dt, dt)
 
 # Initial condition
 T = np.zeros((len(x), len(y), len(t)))  # T(x,y,t) = T(i,j,n) - temperature at position (x,y) at time t
-# T[:, :, 0] = T0
-# T[:, 0, :] = 100
-# T[:, -1, :] = 10
-# T[-1, :, :] = (100 - 60 * y[:, None])
-# T[0, y <= 0.8, :] = (100 - 112.5 * y[y <= 0.8][:, None])
-# T[0, y > 0.8, :] = 10
-
 
 T[:, :, 0] = T0
 T[y <= 0.8, 0, :] = (100 - 112.5 * y[y <= 0.8][:, None])
@@ -98,8 +84,6 @@ T[0, :, :] = 100
 T[-1, : :] = 10
 
 T[:, -1, :] = (100 - 60 * y[:, None])
-
-
 
 def tridiagonal_matrix_algorithm(a, b, c, d):
     """
@@ -246,7 +230,6 @@ def main():
     cbar.set_label('Temperature [C]')
     plt.gca().invert_yaxis()
 
-
     def animate(i):
         im.set_array(T[:, :, i])
         if i % 10 == 0:
@@ -259,6 +242,27 @@ def main():
     print('Creating animation...\n')
     ani.save('temperature_distribution.gif', writer='pillow', fps=10)
     print('Animation saved as temperature_distribution.gif')
+    plt.show()
+
+    print(f'\nsammry:\n')
+    print(f'1. the grid size is {len(x)}x{len(y)}x{len(t)}\n')
+    print(f'2. alpha = k*dt/h^2 = {alpha}\n')
+    print(f'3. Time step = {dt} seconds\n')
+    print(f'4. Total time = {t[-1]} seconds\n')
+    print(f'5. Initial temperature = {T0} [C]\n')
+    print(f'6. Heat sink function: f(x,y,t) = -(10^4)*exp(-((x-1)^2/(2*σ_x^2)))*exp(-((y-0.5)^2/(2*σ_y^2))*exp(-0.1*t)\n')
+    print('7. Boundary conditions:\n')
+    print(f'   T(X,0,t) = 100 [C]\n')
+    print(f'   T(X,1.5,t) = 10 [C]\n')
+    print(f'   T(1.5,Y,t) = 100 - 60y [C]\n')
+    print(f'   T(0,Y,t) = 100 - 112.5y [C] if 0<= y <= 0.8\n')
+    print(f'   T(0,Y,t) = 10 [C] if 0.8 < y <= 1.5\n')
+    print(f'initial condition:\n')
+    print(f'   T(x,y,0) = 10 [C]\n')
+    print(f'snapshots of the temperature distribution at t = 15, 30, 60 [s] saved as temperature_distribution_t15s.png, temperature_distribution_t30s.png, temperature_distribution_t60s.png\n')
+    print(f'Animation saved as temperature_distribution.gif\n')
+    print(f'end of the program\n')
+    print("thank you for using the program")
 
 if __name__ == '__main__':
     main()

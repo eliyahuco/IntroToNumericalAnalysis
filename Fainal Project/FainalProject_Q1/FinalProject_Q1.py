@@ -62,7 +62,6 @@ import matplotlib.animation as animation
 import numerical_analysis_methods_tools as na_tools
 import math as m
 
-
 # Given parameters
 c1 = 2000  # speed of the wave above the layer
 c2 = 3000  # speed of the wave below the layer
@@ -81,14 +80,6 @@ x_line = np.linspace(0, 6000, 10000000)  # x values for the cubic spline interpo
 z_line = np.zeros_like(x_line)  # z values for the cubic spline interpolation of the layer
 
 point_list = [(0, 2600), (1000, 4000), (2600, 3200), (4600, 3600), (6000, 2400)]  # points of the layer
-
-
-
-# Create the grid
-
-
-# Source function
-
 
 def tridiagonal_matrix_algorithm(a, b, c, d):
     """
@@ -239,7 +230,6 @@ def u_plus_1_next_step(u_n_minus_1, u_n, speed_field, dt, dx, dz,source_function
     return u_plus_1
 
 
-
 def animate_wave(U_snapshots, dt, dx, save_path="wave_animation.mp4"):
     """
     Create an animation of the wave field.
@@ -265,8 +255,6 @@ def animate_wave(U_snapshots, dt, dx, save_path="wave_animation.mp4"):
 
     fig, ax = plt.subplots(figsize=(10, 8))
     ax.plot(x, y, label='Cubic Spline Interpolation', color='black', linewidth=2)
-
-
 
     # Create a mesh grid for plotting
     n, m = U_snapshots[0].shape
@@ -300,7 +288,6 @@ def animate_wave(U_snapshots, dt, dx, save_path="wave_animation.mp4"):
     ani.save(save_path, writer="ffmpeg")
     print(f'Animation saved at "{save_path}"\n')
 
-
 def main():
     # initialize the grid
     X, Z = np.meshgrid(x_axis, z_axis)
@@ -323,8 +310,14 @@ def main():
     u_n_minus_1 = np.zeros_like(X, dtype=float)
     dt = [dt1, dt2]
 
+    # Plot the wave velocity field
 
-
+    print(f'Plotting the wave velocity field and the layer...')
+    print(f'the layer points are: {point_list}\n')
+    print(f'Creating the cubic spline interpolation of the layer...')
+    print(f'Creating the wave velocity field...')
+    print(f'the source point is at (3000,2800)\n')
+    print(f'the velocity above the layer is 2000 m/s and below the layer is 3000 m/s\n')
     plt.figure(figsize=(10, 6), dpi=100)
     plt.pcolormesh(X, Z, speed_field, cmap="coolwarm", shading='auto')
     plt.colorbar(label="Wave velocity (m/s)")
@@ -342,12 +335,16 @@ def main():
 
     plt.close()
 
+    print(f'Wave velocity field and the layer saved as wave_velocity_field_and_layer.png\n')
+    print(f'Solving the wave equation... it may take a while...\n')
     u_n_list_dt_1 = []
     u_n_list_dt_2 = []
     plt.figure(figsize=(10, 8), dpi=100)
     for d in range( len(dt)):
 
         u_n[28, 30] = source_function(dt[d], t_source_max)
+        print(f'plotting the wave field for dt = {dt[d]} s...')
+
         for t in np.arange(2*dt[d], t_max + dt[d] , dt[d]):
             t = round(t, 2)
             # Update the wave field
@@ -361,12 +358,15 @@ def main():
 
             if dt[d] == dt1:
                 u_n_list_dt_1.append(u_n)
+
             else:
                 u_n_list_dt_2.append(u_n)
 
-
             # Plot the wave field
             # if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
+
+
+
             plt.clf()
 
             plt.pcolormesh(X, Z, u_n, cmap='coolwarm', shading='auto')
@@ -383,18 +383,25 @@ def main():
             if t in [0.15, 0.4, 0.7, 1] and dt[d] == dt1:
                 # save the plot
                 plt.savefig(f'Wave_Field_for_dt_{dt[d]}_at t = {t}_.png')
+                print(f'Saving the plot as Wave_Field_for_dt_{dt[d]}_at t = {t}.png\n')
             elif t in [0.15, 0.3, 0.6, 0.9] and dt[d] == dt2:
                 # save the plot
                 plt.savefig(f'Wave_Field_for_dt_{dt[d]}_at t = {t}.png')
+                print(f'Saving the plot as Wave_Field_for_dt_{dt[d]}_at t = {t}.png\n')
 
             plt.pause(dt1)
 
             # save the plot as animation
-
+        if dt[d] == dt1:
+            print(f'Creating the animation for dt = {dt[d]} s...')
+            print(f'the solution behaves with the time step Δt = {dt[d]} s\n')
+            print(f'for Δt = 0.01 the solution is stable according the CFL condition\n')
+        elif dt[d] == dt2:
+            print(f'Creating the animation for dt = {dt[d]} s...')
+            print(f'the solution behaves with the time step Δt = {dt[d]} s\n')
+            print(f'for Δt = 0.03 the solution is unstable according the CFL condition\n')
         plt.show()
         plt.close()
-
-
 
         # Create the animation
 
@@ -404,6 +411,19 @@ def main():
             animate_wave(u_n_list_dt_2, dt[d], h, save_path="wave_animation_dt_0.03.gif")
 
 
+    print(f'sammery:\n')
+    print(f'1) The solution behaves with the time step Δt = 0.01 s\n')
+    print(f'2) The solution behaves with the time step Δt = 0.03 s\n')
+    print(f'3) The solution is stable according the CFL condition for Δt = 0.01 s\n')
+    print(f'4) The solution is unstable according the CFL condition for Δt = 0.03 s\n')
+    print(f'5) The snapshots of the wave field at times\n')
+    print(f'for Δt = 0.01 s at t = 0.15 s, 0.4 s, 0.7 s, 1 s\n')
+    print(f'and\n')
+    print(f'for Δt = 0.03 s at t = 0.15 s, 0.3 s, 0.6 s, 0.9 s\n')
+    print(f'6) The animation saved as wave_animation_dt_0.01.gif for Δt = 0.01 s\n')
+    print(f'7) The animation saved as wave_animation_dt_0.03.gif for Δt = 0.03 s\n')
+    print(f'end of the program\n')
+    print("thank you for using the program")
 
 
 if __name__ == '__main__':

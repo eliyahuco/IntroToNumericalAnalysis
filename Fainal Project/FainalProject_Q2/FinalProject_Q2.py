@@ -170,47 +170,96 @@ def ADI_method(T, alpha, heat_sink, dt, x, y, n, t):
 
 # Solve the heat equation
 
+def main():
+    # Constants
+    k = 1.786 * 10 ** -3  # m^2/s
+    sigma_x = 0.00625  # meters
+    sigma_y = 0.00625  # meters
+    h = 0.05  # meters (\u0394x = \u0394y)
+    dt = 0.1  # seconds
+    Lx = 1.5  # meters
+    Ly = 1.5  # meters
+    T0 = 10  # [C]
+    alpha = (k * dt) / (h ** 2)
 
-for n in range(len(t)-1 ):
-    T = ADI_method(T, alpha, heat_sink, dt, x, y, n, t)
+    heat_sink = lambda x, y, t: -(10 ** 4) * np.exp(-((x - 1) ** 2 / (2 * sigma_x ** 2))) * np.exp(
+        -((y - 0.5) ** 2 / (2 * sigma_y ** 2))) * np.exp(-0.1 * t)
 
-# Plot the results in 2D
+    # Grid
+    x = np.arange(0, Lx + h, h)
+    y = np.arange(0, Ly + h, h)
+    t = np.arange(0, 60 + dt, dt)
 
-fig, ax = plt.subplots(1, 3, figsize=(15, 5))
-fig.suptitle('Temperature distribution at different times', fontsize=16)
+    # Initial condition
+    T = np.zeros((len(x), len(y), len(t)))  # T(x,y,t) = T(i,j,n) - temperature at position (x,y) at time t
+    T[y <= 0.8, 0, :] = (100 - 112.5 * y[y <= 0.8][:, None])
+    T[y > 0.8, 0, :] = 10
+    T[0, :, :] = 100
+    T[:, :, 0] = T0
+    T[-1, ::] = 10
 
-for i, time in enumerate([15, 30, 60]):
-    idx = int(time / dt)
-    im = ax[i].imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
-    ax[i].invert_yaxis()  # Invert the Y-axis for each subplot
-    ax[i].set_title(f't = {time} s')
-    ax[i].set_xlabel('x [m]')
-    ax[i].set_ylabel('y [m]')
-    fig.colorbar(im, ax=ax[i], orientation='vertical', label='Temperature [C]')
+    T[:, -1, :] = (100 - 60 * y[:, None])
 
-# Adjust layout to prevent overlap
-plt.tight_layout(rect=[0, 0, 1, 0.95])
-plt.show()
-plt.savefig('temperature_distribution_snapshots.png')
-# Function to update the frame
+    print('Solving the heat equation using the Alternating Direction Implicit (ADI) method...\n')
+    print(f'the grid size is {len(x)}x{len(y)}x{len(t)}\n')
+    print(f'alpha = k*dt/h^2 = {alpha}\n')
+    print(f'Time step = {dt} seconds\n')
+    print(f'Total time = {t[-1]} seconds\n')
+    print(f'Initial temperature = {T0} [C]\n')
+    print(f'Heat sink function: f(x,y,t) = -(10^4)*exp(-((x-1)^2/(2*σ_x^2)))*exp(-((y-0.5)^2/(2*σ_y^2)))*exp(-0.1*t)\n')
+    print('Boundary conditions:\n')
+    print(f'T(X,0,t) = 100 [C]\n')
+    print(f'T(X,1.5,t) = 10 [C]\n')
+    print(f'T(1.5,Y,t) = 100 - 60y [C]\n')
+    print(f'T(0,Y,t) = 100 - 112.5y [C] if 0<= y <= 0.8\n')
+    print(f'T(0,Y,t) = 10 [C] if 0.8 < y <= 1.5\n')
+    print('Solving the heat equation...\n')
 
-fig, ax = plt.subplots()
-im = ax.imshow(T[:, :, 0], cmap='hot', origin='lower', extent=[0, Lx, 0, Ly])
-ax.set_xlabel('x [m]')
-ax.set_ylabel('y [m]')
-cbar = plt.colorbar(im, ax=ax)
-cbar.set_label('Temperature [C]')
+    for n in range(len(t)-1 ):
+        T = ADI_method(T, alpha, heat_sink, dt, x, y, n, t)
+
+    # Plot the results in 2D
+
+    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
+    fig.suptitle('Temperature distribution at different times', fontsize=16)
+
+    for i, time in enumerate([15, 30, 60]):
+        idx = int(time / dt)
+        im = ax[i].imshow(T[:, :, idx], cmap='hot', origin='upper', extent=[0, Lx, 0, Ly])
+        ax[i].invert_yaxis()  # Invert the Y-axis for each subplot
+        ax[i].set_title(f't = {time} s')
+        ax[i].set_xlabel('x [m]')
+        ax[i].set_ylabel('y [m]')
+        fig.colorbar(im, ax=ax[i], orientation='vertical', label='Temperature [C]')
+
+    # Adjust layout to prevent overlap
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.show()
+    print('Saving snapshots as temperature_distribution_snapshots.png\n')
+    plt.savefig('temperature_distribution_snapshots.png')
+    print('Snapshots saved as temperature_distribution_snapshots.png\n')
+    # Function to update the frame
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(T[:, :, 0], cmap='hot', origin='lower', extent=[0, Lx, 0, Ly])
+    ax.set_xlabel('x [m]')
+    ax.set_ylabel('y [m]')
+    cbar = plt.colorbar(im, ax=ax)
+    cbar.set_label('Temperature [C]')
 
 
-def animate(i):
-    im.set_array(T[:, :, i])
-    if i % 10 == 0:
-        ax.set_title(f' Temperature distribution at t = {i * dt} s')
+    def animate(i):
+        im.set_array(T[:, :, i])
+        if i % 10 == 0:
+            ax.set_title(f' Temperature distribution at t = {i * dt} s')
 
-    return im,
+        return im,
 
-ani = animation.FuncAnimation(fig, animate, frames=T.shape[2], interval=100, blit=False)
+    ani = animation.FuncAnimation(fig, animate, frames=T.shape[2], interval=100, blit=False)
 
+    print('Creating animation...\n')
+    ani.save('temperature_distribution.gif', writer='pillow', fps=10)
+    print('Animation saved as temperature_distribution.gif')
 
-plt.show()
-ani.save('temperature_distribution.gif', writer='pillow', fps=10)
+if __name__ == '__main__':
+    main()

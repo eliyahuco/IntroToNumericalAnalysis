@@ -285,7 +285,7 @@ def animate_wave(U_snapshots, dt, dx, save_path="wave_animation.mp4"):
 
     # Save the animation
     print(f'\nSaving animation at "{save_path}" in progress...')
-    ani.save(save_path, writer="ffmpeg")
+    ani.save(save_path, writer="pillow")
     print(f'Animation saved at "{save_path}"\n')
 
 def main():
